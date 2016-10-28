@@ -13,6 +13,8 @@
 
 ## TODO
 
+- Output Swagger config
+
 
 ```xml
 <dependency>

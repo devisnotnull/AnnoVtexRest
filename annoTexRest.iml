@@ -41,7 +41,12 @@
     <orderEntry type="library" name="Maven: asm:asm-util:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-tree:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-analysis:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-web-templ-hbs:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-web-templ-handlebars:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jknack:handlebars:1.3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.2" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4-annotations:4.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mozilla:rhino:1.7R4" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-unit:3.2.1" level="project" />

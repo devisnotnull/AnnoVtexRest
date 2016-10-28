@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.PARAMETER})
 public @interface PathParam {
 
-    String name() default "";
+    String name();
 
     String description() default "no description";
 

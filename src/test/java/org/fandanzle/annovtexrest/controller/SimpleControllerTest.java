@@ -50,7 +50,11 @@ public class SimpleControllerTest {
 
         AnnoVtexRest annoVtexRest = new AnnoVtexRest(vertx);
 
-        annoVtexRest.build("org.fandanzle.annovtexrest.controller.MockController");
+        annoVtexRest.build("org.fandanzle.annovtexrest.controller");
+
+        assertTrue(true);
+
+        async.complete();
 
     }
 

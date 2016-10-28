@@ -63,7 +63,7 @@
 
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-web-templ-hbs</artifactId>
+            <artifactId>vertx-web-templ-handlebars</artifactId>
             <version>3.2.0</version>
         </dependency>
 
