@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.fandanzle.mongi</groupId>
-    <artifactId>mongi-core</artifactId>
-    <version>1.0-ALPHA-SNAPSHOT</version>
+    <groupId>org.fandanzle</groupId>
+    <artifactId>anno-vtex-rest</artifactId>
+    <version>0.1-SNAPSHOT</version>
 
     <!-- Securedata's Developers -->
     <developers>
@@ -27,33 +27,20 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/stump201/mongiORM/issues</url>
+        <url>https://github.com/stump201/AnnoVtexRest/issues</url>
     </issueManagement>
 
     <scm>
-        <developerConnection>scm:git@github.com:stump201/mongiORM.git</developerConnection>
-        <url>git@github.com:stump201/mongiORM.git</url>
+        <developerConnection>scm:git@github.com:stump201/AnnoVtexRest.git</developerConnection>
+        <url>git@github.com:stump201/AnnoVtexRest.git</url>
     </scm>
 
     <dependencies>
-
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-async</artifactId>
-            <version>3.0.4</version>
-        </dependency>
 
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.6.1</version>
         </dependency>
 
         <dependency>
@@ -64,9 +51,22 @@
 
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-mongo-client</artifactId>
+            <artifactId>vertx-web</artifactId>
             <version>3.2.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-templ-jade</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-templ-hbs</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
 
         <dependency>
             <groupId>junit</groupId>
@@ -78,24 +78,6 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-unit</artifactId>
             <version>3.2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-rx-java</artifactId>
-            <version>3.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-rx</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
-            <version>3.0.4</version>
         </dependency>
 
         <!-- LOG4J -->
