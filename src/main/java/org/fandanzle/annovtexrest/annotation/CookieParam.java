@@ -10,12 +10,10 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.PARAMETER})
-public @interface HeaderParam {
+public @interface CookieParam {
 
     String name();
 
     boolean required() default false;
-
-    String description() default "no description";
 
 }

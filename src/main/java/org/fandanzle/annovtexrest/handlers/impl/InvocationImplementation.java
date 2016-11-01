@@ -3,6 +3,7 @@ package org.fandanzle.annovtexrest.handlers.impl;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.AnnoVtexRest;
 import org.fandanzle.annovtexrest.annotation.HeaderParam;
@@ -63,11 +64,7 @@ public class InvocationImplementation implements InvocationInterface{
                     f -> f.getUri().equals(context.currentRoute().getPath())
                 );
 
-        System.out.println("////////////////////////////////////////////////////////");
-
         if(dd.findFirst().isPresent()){
-
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
             Stream<Route> dde = router.stream()
                     .filter(
@@ -85,13 +82,11 @@ public class InvocationImplementation implements InvocationInterface{
                 }
 
                 Parameter[] params = e.getParams();
-                Object[] obj = {};
+                Object[] objInv = new Object[e.getParams().length];
 
                 for(int i=0; i < e.getParams().length; i++) {
 
-                    /**
                     System.out.println("PARAM : " + e.getParams()[i]);
-
                     System.out.println("------------------------------------------------------");
                     System.out.println("name :" + params[i].getName());
                     System.out.println("To String :" + params[i].toString());
@@ -99,39 +94,81 @@ public class InvocationImplementation implements InvocationInterface{
                     System.out.println("Type name : " + params[i].getAnnotatedType().getType().getTypeName());
                     System.out.println("Class Can name : " + params[i].getClass().getCanonicalName());
                     System.out.println("Type Can Name : " + params[i].getType().getCanonicalName());
-                    **/
 
                     org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
-
                     if(processPathParam( pathParam,params[i].getClass() ) != null){
-                        org.fandanzle.annovtexrest.entity.PathParam pathParam1 = new org.fandanzle.annovtexrest.entity.PathParam();
-                        pathParam1.setClazz(params[i].getType().getClass());
-                        pathParam1.setName(pathParam.name());
+
+                        if(params[i].getType() == String.class){
+                            objInv[i] = "pp";
+                        }
+                        if(params[i].getType() == Integer.class){
+                            objInv[i] = 1;
+                        }
+
                     }
 
                     QueryParam queryParam = params[i].getAnnotation(QueryParam.class);
+                    if(processQueryParam( queryParam , params[i].getClass() ) != null){
 
-                    if(processQueryParam( queryParam,params[i].getClass() ) != null){
-                        org.fandanzle.annovtexrest.entity.QueryParam queryParam1 = new org.fandanzle.annovtexrest.entity.QueryParam();
-                        queryParam1.setClazz(params[i].getType().getClass());
-                        queryParam1.setName(queryParam.name());
-                        queryParam1.setRequired(queryParam.required());
-                        System.out.println("QUERY PARAM : " + getQueryParam(queryParam.name()) );
+                        if(params[i].getType() == String.class){
+                            objInv[i] = "qp";
+                        }
+                        if(params[i].getType() == Integer.class){
+                            objInv[i] = 1;
+                        }
+
+
                     }
 
                     HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
-
                     if(processHeaderParam( headerParam,params[i].getClass() ) != null){
-                        org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
-                        headerParam1.setClazz(params[i].getType().getClass());
-                        headerParam1.setName(headerParam.name());
 
+                        if(params[i].getType() == String.class){
+                            objInv[i] = "ip";
+                        }
+                        if(params[i].getType() == Integer.class){
+                            objInv[i] = 1;
+                        }
                     }
+
+                    try {
+
+                        // Step 1) Make an object array and store the parameters that you wish
+                        // to pass it.
+                        // for method1()
+                        // Object[] obj={"hello"}; for method1(String str)
+                        // Object[] obj={"hello",1}; for method1(String str,int number)
+                        // Step 2) Create a class array which will hold the signature of the
+                        // method being called.
+                        Class<?> paramsInv[] = new Class[objInv.length];
+                        for (int uu = 0; uu < objInv.length; uu++) {
+                            if (objInv[uu] instanceof Integer) {
+                                paramsInv[uu] = Integer.class;
+                            } else if (objInv[uu] instanceof String) {
+                                paramsInv[uu] = String.class;
+                            }
+                            // you can do additional checks for other data types if you want.
+                        }
+
+                        String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
+                        String className = e.getInvokeClazz().getName();// Class name
+                        Class<?> cls = Class.forName(className);
+                        Object _instance = cls.newInstance();
+                        Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
+
+                        context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
+
+
+                    }catch (Exception er){
+                        er.printStackTrace();
+                    }
+
+
                 }
+
             });
 
         }
-
 
         System.out.println("###########################################");
         System.out.println("###########################################");

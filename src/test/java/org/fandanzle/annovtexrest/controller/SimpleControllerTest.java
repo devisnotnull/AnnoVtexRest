@@ -44,7 +44,7 @@ public class SimpleControllerTest {
      * @param context
      */
     @Test
-    public void testMongoIndexCreation(TestContext context){
+    public void testMongoIndexCreation(TestContext context) throws Exception{
 
         vertx = Vertx.vertx();
 

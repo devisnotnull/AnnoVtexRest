@@ -63,7 +63,7 @@ public class AnnoVtexRest {
      * @param packageName
      * @return
      */
-    public AnnoVtexRest build(String packageName) {
+    public AnnoVtexRest build(String packageName) throws Exception {
 
         System.out.println("============================================");
         System.out.println("Package Name");
@@ -119,15 +119,8 @@ public class AnnoVtexRest {
 
                         Route route = new Route();
 
-                        System.out.println("****************************************************************************************************************");
-                        System.out.println("Declared functions");
-                        System.out.println(unique.consumes());
-                        System.out.println(unique.produces());
-                        System.out.println(unique.description());
-                        System.out.println(unique.method()[0]);
-                        System.out.println(unique.noCache());
-                        System.out.println( ((RequestMapping) ano).uri()[0] + unique.uri()[0] );
-
+                        route.setInvokeClazz(controllerClazz);
+                        route.setInvokeMethod(method);
                         route.setUri(((RequestMapping) ano).uri()[0] + unique.uri()[0]);
                         route.setProduces(unique.consumes());
                         route.setProduces(unique.produces());
@@ -151,36 +144,39 @@ public class AnnoVtexRest {
 
                         for(int i=0; i < pp.length; i++){
 
-                            PathParam pathParam = pp[i].getAnnotation(PathParam.class);
+                            if(pp[i].getType() == Integer.class || pp[i].getType() == String.class ) {
 
-                            if(processPathParam( pathParam,pp[i].getClass() ) != null){
-                                org.fandanzle.annovtexrest.entity.PathParam pathParam1 = new org.fandanzle.annovtexrest.entity.PathParam();
-                                pathParam1.setClazz(pp[i].getType().getClass());
-                                pathParam1.setName(pathParam.name());
-                                System.out.println( route.getRequiredPathParams() );
-                                route.getRequiredPathParams().add(pathParam1);
+                                PathParam pathParam = pp[i].getAnnotation(PathParam.class);
+
+                                if (processPathParam(pathParam, pp[i].getClass()) != null) {
+                                    org.fandanzle.annovtexrest.entity.PathParam pathParam1 = new org.fandanzle.annovtexrest.entity.PathParam();
+                                    pathParam1.setClazz(pp[i].getType().getClass());
+                                    pathParam1.setName(pathParam.name());
+                                    System.out.println(route.getRequiredPathParams());
+                                    route.getRequiredPathParams().add(pathParam1);
+                                }
+
+                                QueryParam queryParam = pp[i].getAnnotation(QueryParam.class);
+
+                                if (processQueryParam(queryParam, pp[i].getClass()) != null) {
+                                    org.fandanzle.annovtexrest.entity.QueryParam queryParam1 = new org.fandanzle.annovtexrest.entity.QueryParam();
+                                    queryParam1.setClazz(pp[i].getType().getClass());
+                                    queryParam1.setName(queryParam.name());
+                                    queryParam1.setRequired(queryParam.required());
+                                    route.getRequiredQueryParams().add(queryParam1);
+                                }
+
+                                HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
+
+                                if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
+                                    org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
+                                    headerParam1.setClazz(pp[i].getType().getClass());
+                                    headerParam1.setName(headerParam.name());
+                                    route.getRequiredHeaders().add(headerParam1);
+
+                                }
                             }
-
-                            QueryParam queryParam = pp[i].getAnnotation(QueryParam.class);
-
-                            if(processQueryParam( queryParam,pp[i].getClass() ) != null){
-                                org.fandanzle.annovtexrest.entity.QueryParam queryParam1 = new org.fandanzle.annovtexrest.entity.QueryParam();
-                                queryParam1.setClazz(pp[i].getType().getClass());
-                                queryParam1.setName(queryParam.name());
-                                queryParam1.setRequired(queryParam.required());
-                                route.getRequiredQueryParams().add(queryParam1);
-                            }
-
-                            HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
-
-                            if(processHeaderParam( headerParam,pp[i].getClass() ) != null){
-                                org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
-                                headerParam1.setClazz(pp[i].getType().getClass());
-                                headerParam1.setName(headerParam.name());
-                                route.getRequiredHeaders().add(headerParam1);
-
-                            }
-
+                            else throw new Exception("Invalid parameter type, You can only use String and Interger types");
                         }
 
                         routers.add(route);

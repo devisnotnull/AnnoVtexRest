@@ -4,6 +4,7 @@ import org.fandanzle.annovtexrest.MimeTypes;
 import org.fandanzle.annovtexrest.annotation.RequestMapping;
 import org.fandanzle.annovtexrest.annotation.RequestMethods;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,10 @@ import java.util.List;
 public class Route {
 
     private String uri;
+
+    private Class invokeClazz;
+
+    private Method invokeMethod;
 
     private List<PathParam> requiredPathParams = new ArrayList<>();
 
@@ -41,6 +46,24 @@ public class Route {
     }
 
     private Parameter[] params = {};
+
+    public Class getInvokeClazz() {
+        return invokeClazz;
+    }
+
+    public Route setInvokeClazz(Class invokeClazz) {
+        this.invokeClazz = invokeClazz;
+        return this;
+    }
+
+    public Method getInvokeMethod() {
+        return invokeMethod;
+    }
+
+    public Route setInvokeMethod(Method invokeMethod) {
+        this.invokeMethod = invokeMethod;
+        return this;
+    }
 
     public Route(){
         requiredHeaders = new ArrayList<>();

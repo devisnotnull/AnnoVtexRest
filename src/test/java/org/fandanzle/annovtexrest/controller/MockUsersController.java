@@ -2,6 +2,7 @@ package org.fandanzle.annovtexrest.controller;
 
 import org.fandanzle.annovtexrest.MimeTypes;
 import org.fandanzle.annovtexrest.annotation.*;
+import org.fandanzle.annovtexrest.annotation.http.GET;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,10 +49,11 @@ public class MockUsersController {
     public String getSingleUser(
             @PathParam(name="param1") int param1,
             @PathParam(name="param2") int param2,
-            @QueryParam(name = "perPage") int perPage,
-            @QueryParam(name = "pageNumber") int pageNumber,
+            @QueryParam(name = "perPage", required = false) int perPage,
+            @QueryParam(name = "pageNumber", required = false) int pageNumber,
             @HeaderParam(name = "user-agent") String userAgent,
             @HeaderParam(name = "req-type") String requestType
+            //@CookieParam(name="x-ses-id") String dfdf
     ){
 
         return "qefefwefwef";

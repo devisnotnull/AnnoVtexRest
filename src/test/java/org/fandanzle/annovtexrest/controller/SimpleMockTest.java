@@ -43,11 +43,11 @@ public class SimpleMockTest  {
     @Test
     public void e(TestContext context)  {
 
+        final Async async = context.async();
+
+        vertx = Vertx.vertx();
+
         try {
-
-            final Async async = context.async();
-
-            vertx = Vertx.vertx();
 
             annoVtexRest = new AnnoVtexRest(vertx);
 
@@ -89,6 +89,7 @@ public class SimpleMockTest  {
 
         }catch (Exception e){
             e.printStackTrace();
+            async.complete();
         }
 
 
