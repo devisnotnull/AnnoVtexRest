@@ -10,12 +10,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.PARAMETER})
-public @interface QueryParam {
+public @interface Context {
 
-    String name();
-
-    boolean required() default false;
-
-    String description() default "no description";
 
 }

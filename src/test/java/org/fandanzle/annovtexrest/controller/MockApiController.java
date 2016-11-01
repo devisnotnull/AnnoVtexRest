@@ -49,8 +49,8 @@ public class MockApiController {
             @PathParam(name = "id2") int id2,
             @PathParam(name = "id3") int id3,
             @HeaderParam(name = "h1") int h1 ,
-            @HeaderParam(name = "h2") int h2,
-            @QueryParam(name = "q1") int q1
+            @HeaderParam(name = "h2") String h2,
+            @QueryParam(name = "q1") String q1
     ){
 
         List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");

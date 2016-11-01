@@ -1,8 +1,11 @@
 package org.fandanzle.annovtexrest.entity;
 
+import org.fandanzle.annovtexrest.MimeTypes;
 import org.fandanzle.annovtexrest.annotation.RequestMapping;
 import org.fandanzle.annovtexrest.annotation.RequestMethods;
 
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,28 +15,39 @@ public class Route {
 
     private String uri;
 
-    private List<String> requiredRouteParams;
+    private List<PathParam> requiredPathParams = new ArrayList<>();
 
-    private List<String> requiredHeaders;
+    private List<HeaderParam> requiredHeaders = new ArrayList<>();
 
-    private List<String> requiredQueryParams;
-
-    private List<String> providedRouteParams;
-
-    private List<String> providedHeaders;
-
-    private List<String> providedQueryParams;
+    private List<QueryParam> requiredQueryParams = new ArrayList<>();
 
     private List<String> uriBreakDown;
 
-    private String consumes;
+    private MimeTypes consumes;
 
-    private String produces;
+    private MimeTypes produces;
 
     private String description;
 
     private RequestMethods method;
 
+    public Parameter[] getParams() {
+        return params;
+    }
+
+    public Route setParams(Parameter[] params) {
+        this.params = params;
+        return this;
+    }
+
+    private Parameter[] params = {};
+
+    public Route(){
+        requiredHeaders = new ArrayList<>();
+        requiredHeaders = new ArrayList<>();
+        requiredQueryParams = new ArrayList<>();
+        uriBreakDown = new ArrayList<>();
+    }
 
     public String getUri() {
         return uri;
@@ -44,29 +58,29 @@ public class Route {
         return this;
     }
 
-    public List<String> getRequiredRouteParams() {
-        return requiredRouteParams;
+    public List<PathParam> getRequiredPathParams() {
+        return requiredPathParams;
     }
 
-    public Route setRequiredRouteParams(List<String> requiredRouteParams) {
-        this.requiredRouteParams = requiredRouteParams;
+    public Route setRequiredPathParams(List<PathParam> requiredPathParams) {
+        this.requiredPathParams = requiredPathParams;
         return this;
     }
 
-    public List<String> getRequiredHeaders() {
+    public List<HeaderParam> getRequiredHeaders() {
         return requiredHeaders;
     }
 
-    public Route setRequiredHeaders(List<String> requiredHeaders) {
+    public Route setRequiredHeaders(List<HeaderParam> requiredHeaders) {
         this.requiredHeaders = requiredHeaders;
         return this;
     }
 
-    public List<String> getRequiredQueryParams() {
+    public List<QueryParam> getRequiredQueryParams() {
         return requiredQueryParams;
     }
 
-    public Route setRequiredQueryParams(List<String> requiredQueryParams) {
+    public Route setRequiredQueryParams(List<QueryParam> requiredQueryParams) {
         this.requiredQueryParams = requiredQueryParams;
         return this;
     }
@@ -80,20 +94,20 @@ public class Route {
         return this;
     }
 
-    public String getConsumes() {
+    public MimeTypes getConsumes() {
         return consumes;
     }
 
-    public Route setConsumes(String consumes) {
+    public Route setConsumes(MimeTypes consumes) {
         this.consumes = consumes;
         return this;
     }
 
-    public String getProduces() {
+    public MimeTypes getProduces() {
         return produces;
     }
 
-    public Route setProduces(String produces) {
+    public Route setProduces(MimeTypes produces) {
         this.produces = produces;
         return this;
     }
@@ -113,33 +127,6 @@ public class Route {
 
     public Route setMethod(RequestMethods method) {
         this.method = method;
-        return this;
-    }
-
-    public List<String> getProvidedRouteParams() {
-        return providedRouteParams;
-    }
-
-    public Route setProvidedRouteParams(List<String> providedRouteParams) {
-        this.providedRouteParams = providedRouteParams;
-        return this;
-    }
-
-    public List<String> getProvidedHeaders() {
-        return providedHeaders;
-    }
-
-    public Route setProvidedHeaders(List<String> providedHeaders) {
-        this.providedHeaders = providedHeaders;
-        return this;
-    }
-
-    public List<String> getProvidedQueryParams() {
-        return providedQueryParams;
-    }
-
-    public Route setProvidedQueryParams(List<String> providedQueryParams) {
-        this.providedQueryParams = providedQueryParams;
         return this;
     }
 }
