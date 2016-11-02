@@ -3,6 +3,7 @@ package org.fandanzle.annovtexrest.controller;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.MimeTypes;
 import org.fandanzle.annovtexrest.annotation.*;
@@ -26,21 +27,25 @@ public class MockSimpleController {
      */
     @RequestMapping(
             uri = "/all",
-            method = RequestMethods.GET,
+            method = RequestMethods.POST,
             consumes = MimeTypes.APPLICATION_HTML,
             produces = MimeTypes.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
-    public List<String> tesjiot(
+    public JsonObject post(
             Vertx vertx,
             HttpServerRequest request,
             HttpServerResponse response,
             RoutingContext context
     ){
 
-        List<String> arr = Arrays.asList("111111","222222","3333","44444444","efoihwefouwehf","wpifnrwiofn");
+        System.out.println("-------------------------------------------------");
+        System.out.println("POST");
+        System.out.println(context.request().method().name());
+        System.out.println(context.getBodyAsString());
+        System.out.println(context.getBody());
 
-        return arr;
+        return context.getBodyAsJson();
 
     }
 
@@ -51,32 +56,57 @@ public class MockSimpleController {
      * @return
      */
     @RequestMapping(
-            uri = "/users/:id1/:id2/:id3",
+            uri = "/all",
             method = RequestMethods.GET,
             consumes = MimeTypes.APPLICATION_HTML,
             produces = MimeTypes.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
-    public List<String> test(
+    public List<String> get(
             Vertx vertx,
             HttpServerRequest request,
             HttpServerResponse response,
-            RoutingContext context,
-            @PathParam(name = "id1") Integer id1,
-            @PathParam(name = "id2") String id2,
-            @PathParam(name = "id3") String id3
+            RoutingContext context
     ){
 
-        System.out.println("id1 : " + id1);
-        System.out.println("id1 : " + id2);
-        System.out.println("id1 : " + id3);
-
-        List<String> arr = Arrays.asList(
-                id1.toString(),
-                id2,
-                id3);
-
+        List<String> arr = Arrays.asList("111111","222222","3333","44444444","efoihwefouwehf","wpifnrwiofn");
+        System.out.println("-------------------------------------------------");
+        System.out.println("GET");
+        System.out.println(context.request().method().name());
         return arr;
+
+    }
+
+
+
+    /**
+     * USERS GENERIC CLASS
+     * Param types must be of type primitive is there is a primitive
+     *
+     * @return
+     */
+    @RequestMapping(
+            uri = "/all",
+            method = RequestMethods.DELETE,
+            consumes = MimeTypes.APPLICATION_HTML,
+            produces = MimeTypes.APPLICATION_JSON,
+            description = "An endpoint to get all users"
+    )
+    public String delete(
+            Vertx vertx,
+            HttpServerRequest request,
+            HttpServerResponse response,
+            RoutingContext context
+    ){
+
+        System.out.println("-------------------------------------------------");
+        System.out.println("-------------------------------------------------");
+        System.out.println("-------------------------------------------------");
+        System.out.println("-------------------------------------------------");
+        System.out.println("POST");
+        System.out.println(context.request().method().name());
+        System.out.println(context.getBodyAsString());
+        return context.getBodyAsString();
 
     }
 }

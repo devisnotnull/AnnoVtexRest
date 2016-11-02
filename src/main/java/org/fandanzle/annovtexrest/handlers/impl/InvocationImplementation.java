@@ -57,25 +57,22 @@ public class InvocationImplementation implements InvocationInterface{
         // TODO This stream logic is shite, redo
         Stream<Route> dd = router.stream()
                 .filter(
-                    f -> f.getUri().equals(context.currentRoute().getPath())
+                    f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
                 );
 
         if(dd.findFirst().isPresent()){
 
             Stream<Route> dde = router.stream()
                     .filter(
-                            f -> f.getUri().equals(context.currentRoute().getPath())
+                            f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
                     );
 
-            dde.forEach(e->{
+            Route e = dde.findFirst().get();
+
+
+            //dde.forEach(e->{
 
                 System.out.println("__________________________________________________________________________________-");
-
-                if(e.getMethod() == RequestMethods.POST){
-
-                    context.getBodyAsString();
-
-                }
 
                 for(PathParam pathParam : e.getRequiredPathParams()){
                     String id = context.request().getParam(pathParam.getName());
@@ -88,6 +85,7 @@ public class InvocationImplementation implements InvocationInterface{
 
                 for(int i=0; i < e.getParams().length; i++) {
 
+                    /**
                     //System.out.println("PARAM : " + e.getParams()[i]);
                     System.out.println("------------------------------------------------------");
                     System.out.println("name :" + params[i].getName());
@@ -97,6 +95,7 @@ public class InvocationImplementation implements InvocationInterface{
                     //System.out.println("Type name : " + params[i].getAnnotatedType().getType().getTypeName());
                     System.out.println("Class Can name : " + params[i].getClass().getCanonicalName());
                     System.out.println("Type Can Name : " + params[i].getType().getCanonicalName());
+                     **/
 
                     org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
                     if (processPathParam(pathParam, params[i].getClass()) != null) {
@@ -119,7 +118,6 @@ public class InvocationImplementation implements InvocationInterface{
                         if (params[i].getType() == Integer.class) {
                             objInv[i] = 1;
                         }
-
 
                     }
 
@@ -157,7 +155,12 @@ public class InvocationImplementation implements InvocationInterface{
 
                     try {
                         System.out.println("=========================================================================");
-
+                        System.out.println("=========================================================================");
+                        System.out.println("=========================================================================");
+                        System.out.println("=========================================================================");
+                        System.out.println("INVOKE ALLLLL" );
+                        System.out.println(e.getInvokeMethod().getName());
+                        System.out.println(e.getInvokeClazz().getName());
                         // Step 1) Make an object array and store the parameters that you wish
                         // to pass it.
                         // for method1()
@@ -179,7 +182,8 @@ public class InvocationImplementation implements InvocationInterface{
                         Class<?> cls = Class.forName(className);
                         Object _instance = cls.newInstance();
                         Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
-
+                        System.out.println("Content-Type : " + e.getMethod().name());
+                        context.response().putHeader("Content-Type", e.getProduces().name());
                         // If is void this will ignore
                         context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
 
@@ -189,7 +193,7 @@ public class InvocationImplementation implements InvocationInterface{
                     }
 
 
-            });
+            //});
 
         }
 

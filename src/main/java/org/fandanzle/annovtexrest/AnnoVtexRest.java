@@ -5,6 +5,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import org.apache.log4j.Logger;
 
 import org.fandanzle.annovtexrest.annotation.*;
@@ -79,21 +80,25 @@ public class AnnoVtexRest {
 
             Class<?> controllerClazz = ii;
 
+            /**
             System.out.println("============================================");
             System.out.println("Caniconial Name");
             System.out.println(ii.getCanonicalName());
             System.out.println("============================================");
+            **/
 
             // Get our Annotation and type check
             Annotation ano = ii.getAnnotation(Controller.class);
-            System.out.println(ano);
+
             // Check annotation is instance of ProviderTypeAnnotation.class
             if (ano instanceof Controller) {
 
+                /**
                 System.out.println("============================================");
                 System.out.println("Request Mapping URI");
                 System.out.println(((Controller) ano).uri()[0]);
                 System.out.println("============================================");
+                 **/
 
                 Method[] methods = ii.getDeclaredMethods();
 
@@ -101,9 +106,11 @@ public class AnnoVtexRest {
 
                 for (Method method : methods) {
 
+
                     System.out.println("------------------------------------------------------");
                     System.out.println("Method name : " + method.getName());
                     System.out.println(method.getName());
+
 
                     List<String> headerParams = new ArrayList<>();
                     List<String> queryParams = new ArrayList<>();
@@ -137,6 +144,15 @@ public class AnnoVtexRest {
                         if(unique.method()[0] == RequestMethods.GET){
                             router.get(uri).handler(InvocationInterface.create());
                         }else if(unique.method()[0] == RequestMethods.POST) {
+                            // Required for Json uploads
+                            router.route().handler(BodyHandler.create());
+                            router.post(uri).handler(e->{
+                                System.out.println(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
+                                System.out.println(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
+                                System.out.println("TEST BODY");
+                                System.out.println(e.getBodyAsString());
+                                e.next();
+                            });
                             router.post(uri).handler(InvocationInterface.create());
                             router.options(uri).handler(InvocationInterface.create());
                         }else if(unique.method()[0] == RequestMethods.DELETE) {
