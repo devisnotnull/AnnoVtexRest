@@ -2,20 +2,16 @@ package org.fandanzle.annovtexrest;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
-
-import io.vertx.core.json.Json;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import org.apache.log4j.Logger;
-import org.fandanzle.annovtexrest.annotation.HeaderParam;
-import org.fandanzle.annovtexrest.annotation.PathParam;
-import org.fandanzle.annovtexrest.annotation.QueryParam;
-import org.fandanzle.annovtexrest.annotation.RequestMapping;
+
+import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
-import org.fandanzle.annovtexrest.handlers.impl.DefaultMethodInvocationHandler;
-import org.reflections.Reflections;
 
+import org.reflections.Reflections;
 import io.vertx.ext.web.RoutingContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -74,8 +70,10 @@ public class AnnoVtexRest {
 
         Reflections reflections = new Reflections(packageName);
         // Fetch all classes that have the ProviderTypeAnnotation.class annotation
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(RequestMapping.class);
-        // Iterate
+        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Controller.class);
+        // Fetch the Vert.x router
+        router = Router.router(vertx);
+        // Iterate all classes with controller a
         for(Class<?> ii :annotated)
         {
 
@@ -86,17 +84,15 @@ public class AnnoVtexRest {
             System.out.println(ii.getCanonicalName());
             System.out.println("============================================");
 
-            router = Router.router(vertx);
-
             // Get our Annotation and type check
-            Annotation ano = ii.getAnnotation(RequestMapping.class);
+            Annotation ano = ii.getAnnotation(Controller.class);
             System.out.println(ano);
             // Check annotation is instance of ProviderTypeAnnotation.class
-            if (ano instanceof RequestMapping) {
+            if (ano instanceof Controller) {
 
                 System.out.println("============================================");
                 System.out.println("Request Mapping URI");
-                System.out.println(((RequestMapping) ano).uri()[0]);
+                System.out.println(((Controller) ano).uri()[0]);
                 System.out.println("============================================");
 
                 Method[] methods = ii.getDeclaredMethods();
@@ -105,92 +101,118 @@ public class AnnoVtexRest {
 
                 for (Method method : methods) {
 
+                    System.out.println("------------------------------------------------------");
+                    System.out.println("Method name : " + method.getName());
+                    System.out.println(method.getName());
+
                     List<String> headerParams = new ArrayList<>();
                     List<String> queryParams = new ArrayList<>();
                     List<String> routeParams = new ArrayList<>();
 
-                    System.out.println(method.getName());
+                    /**
+                     * Process @RequestMapping annotation for class functions
+                     */
+                    Parameter[] pp = method.getParameters();
                     RequestMapping unique = method.getAnnotation(RequestMapping.class);
 
                     if (unique != null) {
 
-                        System.out.println("------------------------------------------------------");
-                        System.out.println("Method name : " + method.getName());
+                        String uri =  ((Controller) ano).uri()[0] + unique.uri()[0];
 
+                        // TODO delegate to seperate function
+                        // We use an entity to store information on a route,
+                        // this info will be used with swagger/raml for self documentation
                         Route route = new Route();
-
                         route.setInvokeClazz(controllerClazz);
                         route.setInvokeMethod(method);
-                        route.setUri(((RequestMapping) ano).uri()[0] + unique.uri()[0]);
+                        route.setUri(uri);
                         route.setProduces(unique.consumes());
                         route.setProduces(unique.produces());
                         route.setDescription(unique.description());
                         route.setMethod(unique.method()[0]);
 
-                        String dd =  ((RequestMapping) ano).uri()[0] + unique.uri()[0];
-
-                        router.route(((RequestMapping) ano).uri()[0] + unique.uri()[0]).handler(InvocationInterface.create());
-
-                        Pattern p = Pattern.compile("\\{([^}]*)\\}");
-                        Matcher m = p.matcher(dd);
-
-                        while (m.find()) {
-                            routeParams.add( m.group(1) );
+                        // Handle different HTTP request types
+                        // TODO implement all HTTP request types
+                        // TODO delegate to seperate function
+                        if(unique.method()[0] == RequestMethods.GET){
+                            router.get(uri).handler(InvocationInterface.create());
+                        }else if(unique.method()[0] == RequestMethods.POST) {
+                            router.post(uri).handler(InvocationInterface.create());
+                            router.options(uri).handler(InvocationInterface.create());
+                        }else if(unique.method()[0] == RequestMethods.DELETE) {
+                            router.delete(uri).handler(InvocationInterface.create());
+                        }else if(unique.method()[0] == RequestMethods.OPTIONS) {
+                            router.options(uri).handler(InvocationInterface.create());
                         }
 
-                        Parameter[] pp = method.getParameters();
-
+                        /**
+                         * To be removed, We will use standard :id pattern of vertx
+                         */
+                        Pattern p = Pattern.compile("\\{([^}]*)\\}");
+                        Matcher m = p.matcher(uri);
+                        while (m.find()) routeParams.add( m.group(1) );
                         route.setParams(pp);
 
+                        // Iterate all parameters of method, We need to evaulate the params
+                        // to work out the objects to inject into functions
                         for(int i=0; i < pp.length; i++){
 
-                            if(pp[i].getType() == Integer.class || pp[i].getType() == String.class ) {
+                            if(pp[i].getAnnotations().length > 0) {
 
-                                PathParam pathParam = pp[i].getAnnotation(PathParam.class);
+                                if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
 
-                                if (processPathParam(pathParam, pp[i].getClass()) != null) {
-                                    org.fandanzle.annovtexrest.entity.PathParam pathParam1 = new org.fandanzle.annovtexrest.entity.PathParam();
-                                    pathParam1.setClazz(pp[i].getType().getClass());
-                                    pathParam1.setName(pathParam.name());
-                                    System.out.println(route.getRequiredPathParams());
-                                    route.getRequiredPathParams().add(pathParam1);
-                                }
+                                    // Path params to be pulled for URI
+                                    PathParam pathParam = pp[i].getAnnotation(PathParam.class);
+                                    if (processPathParam(pathParam, pp[i].getClass()) != null) {
+                                        org.fandanzle.annovtexrest.entity.PathParam pathParam1 = new org.fandanzle.annovtexrest.entity.PathParam();
+                                        pathParam1.setClazz(pp[i].getType().getClass());
+                                        pathParam1.setName(pathParam.name());
+                                        System.out.println(route.getRequiredPathParams());
+                                        route.getRequiredPathParams().add(pathParam1);
+                                    }
 
-                                QueryParam queryParam = pp[i].getAnnotation(QueryParam.class);
+                                    // Query params to be pulled from the URI
+                                    QueryParam queryParam = pp[i].getAnnotation(QueryParam.class);
+                                    if (processQueryParam(queryParam, pp[i].getClass()) != null) {
+                                        org.fandanzle.annovtexrest.entity.QueryParam queryParam1 = new org.fandanzle.annovtexrest.entity.QueryParam();
+                                        queryParam1.setClazz(pp[i].getType().getClass());
+                                        queryParam1.setName(queryParam.name());
+                                        queryParam1.setRequired(queryParam.required());
+                                        route.getRequiredQueryParams().add(queryParam1);
+                                    }
 
-                                if (processQueryParam(queryParam, pp[i].getClass()) != null) {
-                                    org.fandanzle.annovtexrest.entity.QueryParam queryParam1 = new org.fandanzle.annovtexrest.entity.QueryParam();
-                                    queryParam1.setClazz(pp[i].getType().getClass());
-                                    queryParam1.setName(queryParam.name());
-                                    queryParam1.setRequired(queryParam.required());
-                                    route.getRequiredQueryParams().add(queryParam1);
-                                }
+                                    // Header params to be pulled from URI
+                                    HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
+                                    if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
+                                        org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
+                                        headerParam1.setClazz(pp[i].getType().getClass());
+                                        headerParam1.setName(headerParam.name());
+                                        route.getRequiredHeaders().add(headerParam1);
 
-                                HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
+                                    }
 
-                                if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
-                                    org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
-                                    headerParam1.setClazz(pp[i].getType().getClass());
-                                    headerParam1.setName(headerParam.name());
-                                    route.getRequiredHeaders().add(headerParam1);
+                                    // TODO implement cookie annotation, I know cookies are pulled from the header,
+                                    // But having seperate logic keeps it cleaner
 
-                                }
+                                } else
+                                    throw new Exception("Invalid parameter type, You can only use String and Interger types");
                             }
-                            else throw new Exception("Invalid parameter type, You can only use String and Interger types");
                         }
-
+                        // Add to class scoped var
                         routers.add(route);
 
                     }
-
                 }
-
             }
-
         }
+
+        router.route().handler(ctx -> {
+            ctx.response().putHeader(HttpHeaders.CONTENT_TYPE,"application/json; charset=utf-8").end("{error:'404 not found'}");
+        });
 
         return this;
     }
+
 
     /**
      *
@@ -206,7 +228,7 @@ public class AnnoVtexRest {
      * @param packageName
      * @return
      */
-    public AnnoVtexRest build1(String packageName) {
+    public AnnoVtexRest buildClazz(String packageName) {
 
         System.out.println("============================================");
         System.out.println("Package Name");
@@ -342,7 +364,6 @@ public class AnnoVtexRest {
     private org.fandanzle.annovtexrest.entity.HeaderParam processHeaderParam(HeaderParam anno, Class clazz){
 
         if(anno != null){
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("PATH PARAM");
             System.out.println("Name :" + anno.name());
 
@@ -364,7 +385,6 @@ public class AnnoVtexRest {
     private org.fandanzle.annovtexrest.entity.QueryParam processQueryParam(QueryParam anno, Class clazz){
 
         if(anno != null){
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("QUERY PARAM");
             System.out.println("Name :" + anno.name());
 
@@ -388,7 +408,6 @@ public class AnnoVtexRest {
         List<org.fandanzle.annovtexrest.entity.PathParam> list = new ArrayList<>();
 
         if(anno != null){
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("PATH PARAM");
             System.out.println("Name :" + anno.name());
 
@@ -404,9 +423,9 @@ public class AnnoVtexRest {
     }
 
     /**
-     *
-     * @param queryParameters
-     * @return
+     * Turn Vert.x native @{MultiMap} into a HashMap
+     * @param queryParameters MultiMap from vert.x
+     * @return HashMap
      */
     private HashMap<String,List<String>> prepareParameters(MultiMap queryParameters) {
 
@@ -434,8 +453,5 @@ public class AnnoVtexRest {
         vertx.getAcceptableContentType();
     }
 
-    private void handleGetAllClients(RoutingContext context) {
-
-    }
 
 }

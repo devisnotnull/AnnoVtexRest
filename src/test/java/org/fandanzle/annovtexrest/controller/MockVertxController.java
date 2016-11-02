@@ -5,18 +5,18 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.MimeTypes;
-import org.fandanzle.annovtexrest.annotation.*;
-
-import java.util.Arrays;
+import org.fandanzle.annovtexrest.annotation.Controller;
+import org.fandanzle.annovtexrest.annotation.RequestMapping;
+import org.fandanzle.annovtexrest.annotation.RequestMethods;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by alexb on 28/10/2016.
  */
 
-@Controller(uri = "/simple")
-public class MockSimpleController {
+@Controller(uri = "/stats")
+public class MockVertxController {
 
     /**
      * USERS GENERIC CLASS
@@ -31,16 +31,15 @@ public class MockSimpleController {
             produces = MimeTypes.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
-    public List<String> tesjiot(
+    public Set<String> tesjiot(
             Vertx vertx,
             HttpServerRequest request,
             HttpServerResponse response,
-            RoutingContext context
+            RoutingContext context,
+            Date wfwefwef
     ){
 
-        List<String> arr = Arrays.asList("111111","222222","3333","44444444","efoihwefouwehf","wpifnrwiofn");
-
-        return arr;
+        return vertx.deploymentIDs();
 
     }
 
@@ -51,32 +50,22 @@ public class MockSimpleController {
      * @return
      */
     @RequestMapping(
-            uri = "/users/:id1/:id2/:id3",
-            method = RequestMethods.GET,
+            uri = "/all",
+            method = RequestMethods.POST,
             consumes = MimeTypes.APPLICATION_HTML,
             produces = MimeTypes.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
-    public List<String> test(
+    public Set<String> createStat(
             Vertx vertx,
             HttpServerRequest request,
             HttpServerResponse response,
             RoutingContext context,
-            @PathParam(name = "id1") Integer id1,
-            @PathParam(name = "id2") String id2,
-            @PathParam(name = "id3") String id3
+            Date wfwefwef
     ){
 
-        System.out.println("id1 : " + id1);
-        System.out.println("id1 : " + id2);
-        System.out.println("id1 : " + id3);
-
-        List<String> arr = Arrays.asList(
-                id1.toString(),
-                id2,
-                id3);
-
-        return arr;
+        return vertx.deploymentIDs();
 
     }
+
 }

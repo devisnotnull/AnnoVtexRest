@@ -2,6 +2,8 @@ package org.fandanzle.annovtexrest.handlers.impl;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -9,6 +11,7 @@ import org.fandanzle.annovtexrest.AnnoVtexRest;
 import org.fandanzle.annovtexrest.annotation.HeaderParam;
 import org.fandanzle.annovtexrest.annotation.QueryParam;
 import org.fandanzle.annovtexrest.annotation.RequestMapping;
+import org.fandanzle.annovtexrest.annotation.RequestMethods;
 import org.fandanzle.annovtexrest.entity.PathParam;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
@@ -48,17 +51,10 @@ public class InvocationImplementation implements InvocationInterface{
         List<Route> router = AnnoVtexRest.routers;
 
         if (router == null) return;
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
+
         System.out.println("ROUTER : " + router);
 
+        // TODO This stream logic is shite, redo
         Stream<Route> dd = router.stream()
                 .filter(
                     f -> f.getUri().equals(context.currentRoute().getPath())
@@ -75,6 +71,12 @@ public class InvocationImplementation implements InvocationInterface{
 
                 System.out.println("__________________________________________________________________________________-");
 
+                if(e.getMethod() == RequestMethods.POST){
+
+                    context.getBodyAsString();
+
+                }
+
                 for(PathParam pathParam : e.getRequiredPathParams()){
                     String id = context.request().getParam(pathParam.getName());
                     System.out.println("HERE IS OUR ID ");
@@ -86,34 +88,35 @@ public class InvocationImplementation implements InvocationInterface{
 
                 for(int i=0; i < e.getParams().length; i++) {
 
-                    System.out.println("PARAM : " + e.getParams()[i]);
+                    //System.out.println("PARAM : " + e.getParams()[i]);
                     System.out.println("------------------------------------------------------");
                     System.out.println("name :" + params[i].getName());
+                    System.out.println("Type :" + params[i].getType());
                     System.out.println("To String :" + params[i].toString());
                     System.out.println("Is Name Present :" + params[i].isNamePresent());
-                    System.out.println("Type name : " + params[i].getAnnotatedType().getType().getTypeName());
+                    //System.out.println("Type name : " + params[i].getAnnotatedType().getType().getTypeName());
                     System.out.println("Class Can name : " + params[i].getClass().getCanonicalName());
                     System.out.println("Type Can Name : " + params[i].getType().getCanonicalName());
 
                     org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
-                    if(processPathParam( pathParam,params[i].getClass() ) != null){
+                    if (processPathParam(pathParam, params[i].getClass()) != null) {
 
-                        if(params[i].getType() == String.class){
+                        if (params[i].getType() == String.class) {
                             objInv[i] = "pp";
                         }
-                        if(params[i].getType() == Integer.class){
+                        if (params[i].getType() == Integer.class) {
                             objInv[i] = 1;
                         }
 
                     }
 
                     QueryParam queryParam = params[i].getAnnotation(QueryParam.class);
-                    if(processQueryParam( queryParam , params[i].getClass() ) != null){
+                    if (processQueryParam(queryParam, params[i].getClass()) != null) {
 
-                        if(params[i].getType() == String.class){
+                        if (params[i].getType() == String.class) {
                             objInv[i] = "qp";
                         }
-                        if(params[i].getType() == Integer.class){
+                        if (params[i].getType() == Integer.class) {
                             objInv[i] = 1;
                         }
 
@@ -121,17 +124,39 @@ public class InvocationImplementation implements InvocationInterface{
                     }
 
                     HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
-                    if(processHeaderParam( headerParam,params[i].getClass() ) != null){
+                    if (processHeaderParam(headerParam, params[i].getClass()) != null) {
 
-                        if(params[i].getType() == String.class){
+                        if (params[i].getType() == String.class) {
                             objInv[i] = "ip";
                         }
-                        if(params[i].getType() == Integer.class){
+                        if (params[i].getType() == Integer.class) {
                             objInv[i] = 1;
                         }
                     }
 
+                    if (params[i].getType() == RoutingContext.class) {
+                        System.out.println("ROUTING CONTEXT");
+                        objInv[i] = (RoutingContext) context;
+                    }
+
+                    if (params[i].getType() == Vertx.class) {
+                        System.out.println("VERTX CONTEXT");
+                        objInv[i] = (Vertx) vertx;
+                    }
+
+                    if (params[i].getType() == HttpServerRequest.class) {
+                        System.out.println("SERVER REQUEST CONTEXT");
+                        objInv[i] = (HttpServerRequest) context.request();
+                    }
+
+                    if (params[i].getType() == HttpServerResponse.class) {
+                        System.out.println("SERVER RESPONCE CONTEXT");
+                        objInv[i] = (HttpServerResponse) context.response();
+                    }
+                }
+
                     try {
+                        System.out.println("=========================================================================");
 
                         // Step 1) Make an object array and store the parameters that you wish
                         // to pass it.
@@ -142,12 +167,11 @@ public class InvocationImplementation implements InvocationInterface{
                         // method being called.
                         Class<?> paramsInv[] = new Class[objInv.length];
                         for (int uu = 0; uu < objInv.length; uu++) {
-                            if (objInv[uu] instanceof Integer) {
-                                paramsInv[uu] = Integer.class;
-                            } else if (objInv[uu] instanceof String) {
-                                paramsInv[uu] = String.class;
-                            }
-                            // you can do additional checks for other data types if you want.
+
+                            System.out.println("HERE IS OUR TYPE --------------------------------");
+                            System.out.println((params[uu].getType()));
+                            paramsInv[uu] = params[uu].getType();
+
                         }
 
                         String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
@@ -156,6 +180,7 @@ public class InvocationImplementation implements InvocationInterface{
                         Object _instance = cls.newInstance();
                         Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
 
+                        // If is void this will ignore
                         context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
 
 
@@ -163,8 +188,6 @@ public class InvocationImplementation implements InvocationInterface{
                         er.printStackTrace();
                     }
 
-
-                }
 
             });
 
@@ -256,40 +279,6 @@ public class InvocationImplementation implements InvocationInterface{
 
         }
         return null;
-
-    }
-
-    /**
-     *
-     * @param methodParameter
-     */
-    private void handleParamater(Parameter methodParameter){
-
-        System.out.println("------------------------------------------------------");
-        System.out.println("name :" + methodParameter.getName());
-        System.out.println("To String :" + methodParameter.toString());
-        System.out.println("Is Name Present :" + methodParameter.isNamePresent());
-        System.out.println("Type name : " + methodParameter.getAnnotatedType().getType().getTypeName());
-        System.out.println("Class Can name : " + methodParameter.getClass().getCanonicalName());
-        System.out.println("Type Can Name : " + methodParameter.getType().getCanonicalName());
-
-        org.fandanzle.annovtexrest.annotation.PathParam pathParam = methodParameter.getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
-
-        if(processPathParam( pathParam, methodParameter.getClass() ) != null){
-
-        }
-
-        QueryParam queryParam = methodParameter.getAnnotation(QueryParam.class);
-
-        if(processQueryParam( queryParam, methodParameter.getClass() ) != null){
-
-        }
-
-        HeaderParam headerParam = methodParameter.getAnnotation(HeaderParam.class);
-
-        if(processQueryParam( queryParam, methodParameter.getClass() ) != null){
-
-        }
 
     }
 

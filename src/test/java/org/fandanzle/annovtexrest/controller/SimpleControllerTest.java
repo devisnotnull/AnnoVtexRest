@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
  * Created by alexb on 06/07/15.
  *
  */
-@RunWith(VertxUnitRunner.class)
+//@RunWith(VertxUnitRunner.class)
 public class SimpleControllerTest {
 
     private Logger logger = Logger.getLogger(SimpleControllerTest.class);

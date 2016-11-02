@@ -14,7 +14,13 @@ public @interface Controller {
 
     String[] uri() default {};
 
+    RequestMethods[] method() default {RequestMethods.DELETE};
+
     String description() default "no description";
+
+    MimeTypes consumes() default MimeTypes.APPLICATION_HTML;
+
+    MimeTypes produces() default MimeTypes.APPLICATION_JSON;
 
     String charset() default "UTF-8";
 

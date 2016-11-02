@@ -55,6 +55,7 @@ public class SimpleMockTest  {
 
             System.out.println("////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             System.out.println("DONE WITH BUILD");
+
             router = Router.router(vertx);
 
             System.out.println("=================================");
@@ -75,21 +76,10 @@ public class SimpleMockTest  {
 
             client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8000));
 
-            client.getNow("/users/all", response ->{
-                System.out.println(response.statusCode());
-                System.out.println("woehwouhfwoihf owihf oewihfoi wefouewhfo uewhfouwe h");
-            });
-
-            client.getNow("some-uri", response -> {
-                // the status code - e.g. 200 or 404
-                System.out.println("Status code is " + response.statusCode());
-                // the status message e.g. "OK" or "Not Found".
-                System.out.println("Status message is " + response.statusMessage());
-            });
 
         }catch (Exception e){
             e.printStackTrace();
-            async.complete();
+            //async.complete();
         }
 
 
