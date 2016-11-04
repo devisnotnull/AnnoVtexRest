@@ -153,60 +153,50 @@ public class InvocationImplementation implements InvocationInterface{
                     }
                 }
 
-                    try {
-                        System.out.println("=========================================================================");
-                        System.out.println("=========================================================================");
-                        System.out.println("=========================================================================");
-                        System.out.println("=========================================================================");
-                        System.out.println("INVOKE ALLLLL" );
-                        System.out.println(e.getInvokeMethod().getName());
-                        System.out.println(e.getInvokeClazz().getName());
-                        // Step 1) Make an object array and store the parameters that you wish
-                        // to pass it.
-                        // for method1()
-                        // Object[] obj={"hello"}; for method1(String str)
-                        // Object[] obj={"hello",1}; for method1(String str,int number)
-                        // Step 2) Create a class array which will hold the signature of the
-                        // method being called.
-                        Class<?> paramsInv[] = new Class[objInv.length];
-                        for (int uu = 0; uu < objInv.length; uu++) {
+                // Handle reflections based call from Route.class object
+                try {
 
-                            System.out.println("HERE IS OUR TYPE --------------------------------");
-                            System.out.println((params[uu].getType()));
-                            paramsInv[uu] = params[uu].getType();
+                    // Proccess each class for each value
+                    Class<?> paramsInv[] = new Class[objInv.length];
+                    for (int uu = 0; uu < objInv.length; uu++) {
 
-                        }
+                        System.out.println("HERE IS OUR TYPE --------------------------------");
+                        System.out.println((params[uu].getType()));
+                        paramsInv[uu] = params[uu].getType();
 
-                        String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
-                        String className = e.getInvokeClazz().getName();// Class name
-                        Class<?> cls = Class.forName(className);
-                        Object _instance = cls.newInstance();
-                        Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
-                        System.out.println("Content-Type : " + e.getMethod().name());
-                        context.response().putHeader("Content-Type", e.getProduces().name());
-                        // If is void this will ignore
+                    }
+                    // Set names from annotation to invoke
+                    String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
+                    String className = e.getInvokeClazz().getName();// Class name
+                    Class<?> cls = Class.forName(className);
+                    Object _instance = cls.newInstance();
+                    Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
+
+                    // Set content type from annotation
+                    context.response().putHeader("Content-Type", e.getProduces().name());
+
+                    // If is void this will ignore
+                    // Void checker
+                    Object isVoid = myMethod.invoke(_instance, objInv);
+                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
+                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
+                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
+                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
+                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
+                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
+
+                    // If return type of invoked function is null we assume that return logic is handeled via the invoked function
+                    //
+                    if(isVoid != null){
                         context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
-
-
-                    }catch (Exception er){
-                        er.printStackTrace();
                     }
 
 
-            //});
+                }catch (Exception er){
+                    er.printStackTrace();
+                }
 
         }
-
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("URI  : " + context.request().uri() );
-        System.out.println("ROUTE PATH  : " + context.currentRoute().getPath() );
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-        System.out.println("###########################################");
-
-        context.response().end("qofrhqu yew9hye orhewo8 ehwohewf oewhfohewf owehfoiwehf owuehi ");
 
     }
 

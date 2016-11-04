@@ -20,6 +20,8 @@ public class Route {
 
     private Method invokeMethod;
 
+    private List<String> scopes;
+
     private List<PathParam> requiredPathParams = new ArrayList<>();
 
     private List<HeaderParam> requiredHeaders = new ArrayList<>();
@@ -35,6 +37,15 @@ public class Route {
     private String description;
 
     private RequestMethods method;
+
+    public List<String> getScopes() {
+        return scopes;
+    }
+
+    public Route setScopes(List<String> scopes) {
+        this.scopes = scopes;
+        return this;
+    }
 
     public Parameter[] getParams() {
         return params;

@@ -79,10 +79,10 @@ public class SimpleMockTest  {
 
         }catch (Exception e){
             e.printStackTrace();
-            //async.complete();
+            async.complete();
         }
 
-
+        async.complete();
 
     }
 

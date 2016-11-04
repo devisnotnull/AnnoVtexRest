@@ -3,12 +3,16 @@ package org.fandanzle.annovtexrest;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import jdk.internal.dynalink.support.Guards;
 import org.apache.log4j.Logger;
 
 import org.fandanzle.annovtexrest.annotation.*;
+import org.fandanzle.annovtexrest.annotation.auth.Guard;
+import org.fandanzle.annovtexrest.authz.AuthzHandlerInterface;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
 
@@ -45,6 +49,16 @@ public class AnnoVtexRest {
     }
 
     /**
+     * Set the authentication handler for Annotex instance
+     *
+     * @param handleAuthz
+     * @return
+     */
+    public AnnoVtexRest setAuthzHandler(AuthzHandlerInterface handleAuthz){
+
+        return this;
+    }
+    /**
      *
      * @param vertx
      * @param config
@@ -74,18 +88,14 @@ public class AnnoVtexRest {
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Controller.class);
         // Fetch the Vert.x router
         router = Router.router(vertx);
-        // Iterate all classes with controller a
+        // Iterate all classes with controller
+
+        // TODO Seperate out all this shit into seperate functions !!!!
+        // TODO This is messy as shit
         for(Class<?> ii :annotated)
         {
 
             Class<?> controllerClazz = ii;
-
-            /**
-            System.out.println("============================================");
-            System.out.println("Caniconial Name");
-            System.out.println(ii.getCanonicalName());
-            System.out.println("============================================");
-            **/
 
             // Get our Annotation and type check
             Annotation ano = ii.getAnnotation(Controller.class);
@@ -93,28 +103,9 @@ public class AnnoVtexRest {
             // Check annotation is instance of ProviderTypeAnnotation.class
             if (ano instanceof Controller) {
 
-                /**
-                System.out.println("============================================");
-                System.out.println("Request Mapping URI");
-                System.out.println(((Controller) ano).uri()[0]);
-                System.out.println("============================================");
-                 **/
-
                 Method[] methods = ii.getDeclaredMethods();
 
-                System.out.println("Class methods : ");
-
                 for (Method method : methods) {
-
-
-                    System.out.println("------------------------------------------------------");
-                    System.out.println("Method name : " + method.getName());
-                    System.out.println(method.getName());
-
-
-                    List<String> headerParams = new ArrayList<>();
-                    List<String> queryParams = new ArrayList<>();
-                    List<String> routeParams = new ArrayList<>();
 
                     /**
                      * Process @RequestMapping annotation for class functions
@@ -122,10 +113,23 @@ public class AnnoVtexRest {
                     Parameter[] pp = method.getParameters();
                     RequestMapping unique = method.getAnnotation(RequestMapping.class);
 
+                    // Handle our guards only if that method has a @RequestMapping annotation
+                    //
+                    List<String> guardsList = new ArrayList<>();
+                    Guard guard = method.getAnnotation(Guard.class);
+
+                    // Iterate Guard scopes
+                    if (guard != null){
+                        String[] guards = guard.scopes();
+                        for(int i=0; i < guards.length; i++){
+                            String gg = guards[i];
+                            guardsList.add(gg);
+                        }
+                    }
+
                     if (unique != null) {
 
                         String uri =  ((Controller) ano).uri()[0] + unique.uri()[0];
-
                         // TODO delegate to seperate function
                         // We use an entity to store information on a route,
                         // this info will be used with swagger/raml for self documentation
@@ -147,10 +151,6 @@ public class AnnoVtexRest {
                             // Required for Json uploads
                             router.route().handler(BodyHandler.create());
                             router.post(uri).handler(e->{
-                                System.out.println(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
-                                System.out.println(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
-                                System.out.println("TEST BODY");
-                                System.out.println(e.getBodyAsString());
                                 e.next();
                             });
                             router.post(uri).handler(InvocationInterface.create());
@@ -160,14 +160,6 @@ public class AnnoVtexRest {
                         }else if(unique.method()[0] == RequestMethods.OPTIONS) {
                             router.options(uri).handler(InvocationInterface.create());
                         }
-
-                        /**
-                         * To be removed, We will use standard :id pattern of vertx
-                         */
-                        Pattern p = Pattern.compile("\\{([^}]*)\\}");
-                        Matcher m = p.matcher(uri);
-                        while (m.find()) routeParams.add( m.group(1) );
-                        route.setParams(pp);
 
                         // Iterate all parameters of method, We need to evaulate the params
                         // to work out the objects to inject into functions

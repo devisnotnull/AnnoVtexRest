@@ -1,4 +1,4 @@
-package org.fandanzle.annovtexrest.controller;
+package org.fandanzle.annovtexrest.example.controller.simple;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
@@ -6,10 +6,11 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.MimeTypes;
-import org.fandanzle.annovtexrest.annotation.*;
+import org.fandanzle.annovtexrest.annotation.Controller;
+import org.fandanzle.annovtexrest.annotation.RequestMapping;
+import org.fandanzle.annovtexrest.annotation.RequestMethods;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**

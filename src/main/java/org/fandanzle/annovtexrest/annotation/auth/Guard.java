@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Created by alexb on 01/11/2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.PARAMETER})
+@Target(value = {ElementType.METHOD})
 public @interface Guard {
 
     String[] scopes() default {};
