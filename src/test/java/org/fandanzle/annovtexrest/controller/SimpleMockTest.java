@@ -5,6 +5,7 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import org.apache.log4j.Logger;
 import org.fandanzle.annovtexrest.AnnoVtexRest;
@@ -50,32 +51,25 @@ public class SimpleMockTest  {
         try {
 
             annoVtexRest = new AnnoVtexRest(vertx);
-
             annoVtexRest.build("org.fandanzle.annovtexrest.controller");
-
-            System.out.println("////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            System.out.println("DONE WITH BUILD");
-
             router = Router.router(vertx);
 
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
+            System.out.println( Json.encode( annoVtexRest.getRouter().getRoutes())  );
 
-            System.out.println(Json.encode(annoVtexRest.getRouter().getRoutes()));
+            for(org.fandanzle.annovtexrest.entity.Route rr : annoVtexRest.getRoutes()){
+
+                System.out.println("Route URI : " + rr.getUri() );
+                System.out.println("Route Method : " + rr.getMethod() );
+                System.out.println("Route Description : " + rr.getDescription() );
+                System.out.println("Route Consumes : " + rr.getConsumes());
+                System.out.println("Route Produces : " + rr.getProduces());
+                System.out.println("Route Envoked Clazz : " + rr.getInvokeClazz() );
+                System.out.println("Route Envoked Method : " + rr.getInvokeMethod() );
+
+            }
 
             server =  vertx.createHttpServer().requestHandler(annoVtexRest.getRouter()::accept).listen(8000);
-
             client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8000));
-
 
         }catch (Exception e){
             e.printStackTrace();

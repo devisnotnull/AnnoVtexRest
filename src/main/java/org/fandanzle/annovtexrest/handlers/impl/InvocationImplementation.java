@@ -52,14 +52,13 @@ public class InvocationImplementation implements InvocationInterface{
 
         if (router == null) return;
 
-        System.out.println("ROUTER : " + router);
-
         // TODO This stream logic is shite, redo
         Stream<Route> dd = router.stream()
                 .filter(
                     f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
                 );
 
+        // Find our route in the stream
         if(dd.findFirst().isPresent()){
 
             Stream<Route> dde = router.stream()
@@ -68,134 +67,106 @@ public class InvocationImplementation implements InvocationInterface{
                     );
 
             Route e = dde.findFirst().get();
+            Parameter[] params = e.getParams();
+            Object[] objInv = new Object[e.getParams().length];
 
+            for(int i=0; i < e.getParams().length; i++) {
 
-            //dde.forEach(e->{
+                 System.out.println("------------------------------------------------------");
+                 System.out.println("name :" + params[i].getName());
+                 System.out.println("Type :" + params[i].getType());
+                 System.out.println("To String :" + params[i].toString());
+                 System.out.println("Is Name Present :" + params[i].isNamePresent());
+                 System.out.println("Class Can name : " + params[i].getClass().getCanonicalName());
+                 System.out.println("Type Can Name : " + params[i].getType().getCanonicalName());
 
-                System.out.println("__________________________________________________________________________________-");
+                // Fetch our PathParam
+                org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
+                if (processPathParam(pathParam, params[i].getClass()) != null) {
 
-                for(PathParam pathParam : e.getRequiredPathParams()){
-                    String id = context.request().getParam(pathParam.getName());
-                    System.out.println("HERE IS OUR ID ");
-                    System.out.println(pathParam.getName() + "  : " + id);
+                    if (params[i].getType() == String.class) {
+                        objInv[i] = new String(context.request().getParam(params[i].getName()));
+                    }
+                    if (params[i].getType() == Integer.class) {
+                        objInv[i] = new Integer(context.request().getParam(params[i].getName()));
+                    }
+
                 }
 
-                Parameter[] params = e.getParams();
-                Object[] objInv = new Object[e.getParams().length];
+                // Fetch our QueryParam
+                QueryParam queryParam = params[i].getAnnotation(QueryParam.class);
+                if (processQueryParam(queryParam, params[i].getClass()) != null) {
 
-                for(int i=0; i < e.getParams().length; i++) {
-
-                    /**
-                    //System.out.println("PARAM : " + e.getParams()[i]);
-                    System.out.println("------------------------------------------------------");
-                    System.out.println("name :" + params[i].getName());
-                    System.out.println("Type :" + params[i].getType());
-                    System.out.println("To String :" + params[i].toString());
-                    System.out.println("Is Name Present :" + params[i].isNamePresent());
-                    //System.out.println("Type name : " + params[i].getAnnotatedType().getType().getTypeName());
-                    System.out.println("Class Can name : " + params[i].getClass().getCanonicalName());
-                    System.out.println("Type Can Name : " + params[i].getType().getCanonicalName());
-                     **/
-
-                    org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
-                    if (processPathParam(pathParam, params[i].getClass()) != null) {
-
-                        if (params[i].getType() == String.class) {
-                            objInv[i] = "pp";
-                        }
-                        if (params[i].getType() == Integer.class) {
-                            objInv[i] = 1;
-                        }
-
+                    if (params[i].getType() == String.class) {
+                        objInv[i] = new String(context.request().getParam(params[i].getName()));
+                    }
+                    if (params[i].getType() == Integer.class) {
+                        objInv[i] = new Integer(context.request().getParam(params[i].getName()));
                     }
 
-                    QueryParam queryParam = params[i].getAnnotation(QueryParam.class);
-                    if (processQueryParam(queryParam, params[i].getClass()) != null) {
+                }
 
-                        if (params[i].getType() == String.class) {
-                            objInv[i] = "qp";
-                        }
-                        if (params[i].getType() == Integer.class) {
-                            objInv[i] = 1;
-                        }
+                // Fetch our HeaderParam
+                HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
+                if (processHeaderParam(headerParam, params[i].getClass()) != null) {
 
+                    if (params[i].getType() == String.class) {
+                        objInv[i] = new String(context.request().getParam(params[i].getName()));
                     }
-
-                    HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
-                    if (processHeaderParam(headerParam, params[i].getClass()) != null) {
-
-                        if (params[i].getType() == String.class) {
-                            objInv[i] = "ip";
-                        }
-                        if (params[i].getType() == Integer.class) {
-                            objInv[i] = 1;
-                        }
-                    }
-
-                    if (params[i].getType() == RoutingContext.class) {
-                        System.out.println("ROUTING CONTEXT");
-                        objInv[i] = (RoutingContext) context;
-                    }
-
-                    if (params[i].getType() == Vertx.class) {
-                        System.out.println("VERTX CONTEXT");
-                        objInv[i] = (Vertx) vertx;
-                    }
-
-                    if (params[i].getType() == HttpServerRequest.class) {
-                        System.out.println("SERVER REQUEST CONTEXT");
-                        objInv[i] = (HttpServerRequest) context.request();
-                    }
-
-                    if (params[i].getType() == HttpServerResponse.class) {
-                        System.out.println("SERVER RESPONCE CONTEXT");
-                        objInv[i] = (HttpServerResponse) context.response();
+                    if (params[i].getType() == Integer.class) {
+                        objInv[i] = new Integer(context.request().getParam(params[i].getName()));
                     }
                 }
 
-                // Handle reflections based call from Route.class object
-                try {
-
-                    // Proccess each class for each value
-                    Class<?> paramsInv[] = new Class[objInv.length];
-                    for (int uu = 0; uu < objInv.length; uu++) {
-
-                        System.out.println("HERE IS OUR TYPE --------------------------------");
-                        System.out.println((params[uu].getType()));
-                        paramsInv[uu] = params[uu].getType();
-
-                    }
-                    // Set names from annotation to invoke
-                    String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
-                    String className = e.getInvokeClazz().getName();// Class name
-                    Class<?> cls = Class.forName(className);
-                    Object _instance = cls.newInstance();
-                    Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
-
-                    // Set content type from annotation
-                    context.response().putHeader("Content-Type", e.getProduces().name());
-
-                    // If is void this will ignore
-                    // Void checker
-                    Object isVoid = myMethod.invoke(_instance, objInv);
-                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
-                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
-                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
-                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
-                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
-                    System.out.println("WHAT IS THIS ?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>?>>?>");
-
-                    // If return type of invoked function is null we assume that return logic is handeled via the invoked function
-                    //
-                    if(isVoid != null){
-                        context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
-                    }
-
-
-                }catch (Exception er){
-                    er.printStackTrace();
+                if (params[i].getType() == RoutingContext.class) {
+                    objInv[i] = (RoutingContext) context;
                 }
 
+                if (params[i].getType() == Vertx.class) {
+                    objInv[i] = (Vertx) vertx;
+                }
+
+                if (params[i].getType() == HttpServerRequest.class) {
+                    objInv[i] = (HttpServerRequest) context.request();
+                }
+
+                if (params[i].getType() == HttpServerResponse.class) {
+                    objInv[i] = (HttpServerResponse) context.response();
+                }
+            }
+
+            System.out.println("");
+            // Handle reflections based call from Route.class object
+            try {
+
+                // Proccess each class for each value
+                Class<?> paramsInv[] = new Class[objInv.length];
+                for (int uu = 0; uu < objInv.length; uu++) {
+
+                    System.out.println("HERE IS OUR TYPE --------------------------------");
+                    System.out.println((params[uu].getType()));
+                    paramsInv[uu] = params[uu].getType();
+
+                }
+                // Set names from annotation to invoke
+                String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
+                String className = e.getInvokeClazz().getName();// Class name
+                Class<?> cls = Class.forName(className);
+                Object _instance = cls.newInstance();
+                Method myMethod = cls.getDeclaredMethod(methodName, paramsInv);
+                // Set content type from annotation
+                context.response().putHeader("Content-Type", e.getProduces().name());
+                // If is void this will ignore
+                // Void checker
+                Object isVoid = myMethod.invoke(_instance, objInv);
+                // If return type of invoked function is null we assume that return logic is handeled via the invoked function
+                if(isVoid != null){
+                    context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
+                }
+            }catch (Exception er){
+                er.printStackTrace();
+                context.response().setStatusCode(500).end(er.getMessage());
+            }
         }
 
     }
@@ -238,10 +209,6 @@ public class InvocationImplementation implements InvocationInterface{
      */
     private Parameter[] handleMethod(Method controllerMethod){
 
-        List<String> headerParams = new ArrayList<>();
-        List<String> queryParams = new ArrayList<>();
-        List<String> routeParams = new ArrayList<>();
-
         System.out.println(controllerMethod.getName());
         RequestMapping unique = controllerMethod.getAnnotation(RequestMapping.class);
 
@@ -258,16 +225,6 @@ public class InvocationImplementation implements InvocationInterface{
 
             String dd = ((RequestMapping) unique).uri()[0] + unique.uri()[0];
 
-            Pattern p = Pattern.compile("\\{([^}]*)\\}");
-            Matcher m = p.matcher(dd);
-
-            while (m.find()) {
-                routeParams.add(m.group(1));
-            }
-
-            for(Parameter param : controllerMethod.getParameters()){
-                //this.handleParamater(param);
-            }
 
             return controllerMethod.getParameters();
 

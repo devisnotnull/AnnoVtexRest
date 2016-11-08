@@ -39,6 +39,8 @@ public class AnnoVtexRest {
     private JsonObject config;
     private List<String> uriList = new ArrayList<>();
     private Router router;
+    private List<Route> routes = new ArrayList<>();
+    public static List<Route> routers = new ArrayList<>();
 
     /**
      *
@@ -58,16 +60,6 @@ public class AnnoVtexRest {
 
         return this;
     }
-    /**
-     *
-     * @param vertx
-     * @param config
-     */
-    public AnnoVtexRest(Vertx vertx, JsonObject config){
-        this.vertx = vertx;
-    }
-
-    public static List<Route> routers = new ArrayList<>();
 
     /**
      *
@@ -89,7 +81,6 @@ public class AnnoVtexRest {
         // Fetch the Vert.x router
         router = Router.router(vertx);
         // Iterate all classes with controller
-
         // TODO Seperate out all this shit into seperate functions !!!!
         // TODO This is messy as shit
         for(Class<?> ii :annotated)
@@ -141,6 +132,7 @@ public class AnnoVtexRest {
                         route.setProduces(unique.produces());
                         route.setDescription(unique.description());
                         route.setMethod(unique.method()[0]);
+                        route.setParams(pp);
 
                         // Handle different HTTP request types
                         // TODO implement all HTTP request types
@@ -196,7 +188,6 @@ public class AnnoVtexRest {
                                         headerParam1.setClazz(pp[i].getType().getClass());
                                         headerParam1.setName(headerParam.name());
                                         route.getRequiredHeaders().add(headerParam1);
-
                                     }
 
                                     // TODO implement cookie annotation, I know cookies are pulled from the header,
@@ -207,6 +198,7 @@ public class AnnoVtexRest {
                             }
                         }
                         // Add to class scoped var
+                        routes.add(route);
                         routers.add(route);
 
                     }
@@ -223,11 +215,19 @@ public class AnnoVtexRest {
 
 
     /**
-     *
+     * Get the Vert.x router used in context of this instance
      * @return
      */
     public Router getRouter(){
         return this.router;
+    }
+
+    /**
+     * Return list of Route entities
+     * @return
+     */
+    public List<Route> getRoutes(){
+        return this.routes;
     }
 
 
@@ -336,14 +336,6 @@ public class AnnoVtexRest {
      */
     private void handleParamater(Parameter methodParameter){
 
-        System.out.println("------------------------------------------------------");
-        System.out.println("name :" + methodParameter.getName());
-        System.out.println("To String :" + methodParameter.toString());
-        System.out.println("Is Name Present :" + methodParameter.isNamePresent());
-        System.out.println("Type name : " + methodParameter.getAnnotatedType().getType().getTypeName());
-        System.out.println("Class Can name : " + methodParameter.getClass().getCanonicalName());
-        System.out.println("Type Can Name : " + methodParameter.getType().getCanonicalName());
-
         PathParam pathParam = methodParameter.getAnnotation(PathParam.class);
 
         if(processPathParam( pathParam, methodParameter.getClass() ) != null){
@@ -374,7 +366,6 @@ public class AnnoVtexRest {
         if(anno != null){
             System.out.println("PATH PARAM");
             System.out.println("Name :" + anno.name());
-
             org.fandanzle.annovtexrest.entity.HeaderParam param = new org.fandanzle.annovtexrest.entity.HeaderParam();
             param.setName(anno.name());
             param.setDescription(anno.description());
