@@ -3,6 +3,7 @@ package org.fandanzle.annovtexrest.example.controller.user;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.MimeTypes;
 import org.fandanzle.annovtexrest.annotation.*;
@@ -35,7 +36,6 @@ public class MockUsersController {
     ){
         List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
         return arr;
-
     }
 
     /**
@@ -43,25 +43,38 @@ public class MockUsersController {
      * @return
      */
     @RequestMapping(
-            uri = "/users/:param1/:param2",
+            uri = "/users/:param1/:param2/:param3",
             method = RequestMethods.GET,
             produces = MimeTypes.APPLICATION_JSON,
             description = "An endpoint to get a specific user with another paramter for refinement"
     )
-    public String getSingleUser(
+    public JsonObject getSingleUser(
             Vertx vertx,
             HttpServerRequest request,
             HttpServerResponse response,
             RoutingContext context,
             @PathParam(name="param1") Integer param1,
             @PathParam(name="param2") Integer param2,
-            @QueryParam(name = "perPage", required = false) Integer perPage,
-            @QueryParam(name = "pageNumber", required = false) Integer pageNumber,
-            @HeaderParam(name = "user-agent") String userAgent,
-            @HeaderParam(name = "req-type") String requestType
+            @PathParam(name="param3") String param3,
+            @QueryParam(name = "q1") String q1
+
     ){
 
-        return "qefefwefwef";
+        JsonObject dd = new JsonObject()
+                .put("item", "fefewf")
+                .put("wefwefwefwef","efefwefwef")
+                .put("item", "fefewf")
+                .put("wefwefwefwef","efefwefwef")
+                .put("item", "fefewf")
+                .put("wefwefwefwef","efefwefwef")
+                .put("item", "fefewf")
+                .put("wefwefwefwef","efefwefwef")
+                .put("item", "fefewf")
+                .put("wefwefwefwef","efefwefwef")
+                .put("item", "fefewf")
+                .put("wefwefwefwef","efefwefwef");
+
+        return dd;
 
     }
 

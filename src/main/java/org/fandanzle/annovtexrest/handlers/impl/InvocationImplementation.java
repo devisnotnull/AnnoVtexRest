@@ -72,50 +72,51 @@ public class InvocationImplementation implements InvocationInterface{
 
             for(int i=0; i < e.getParams().length; i++) {
 
-                 System.out.println("------------------------------------------------------");
-                 System.out.println("name :" + params[i].getName());
-                 System.out.println("Type :" + params[i].getType());
-                 System.out.println("To String :" + params[i].toString());
-                 System.out.println("Is Name Present :" + params[i].isNamePresent());
-                 System.out.println("Class Can name : " + params[i].getClass().getCanonicalName());
-                 System.out.println("Type Can Name : " + params[i].getType().getCanonicalName());
-
+                //
                 // Fetch our PathParam
                 org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
                 if (processPathParam(pathParam, params[i].getClass()) != null) {
 
-                    if (params[i].getType() == String.class) {
-                        objInv[i] = new String(context.request().getParam(params[i].getName()));
-                    }
-                    if (params[i].getType() == Integer.class) {
-                        objInv[i] = new Integer(context.request().getParam(params[i].getName()));
+                    try {
+                        if (params[i].getType() == String.class) {
+                            objInv[i] = context.request().getParam(pathParam.name());
+                        }
+                        else if (params[i].getType() == Integer.class) {
+                            objInv[i] = Integer.valueOf(context.request().getParam(pathParam.name()));
+                        }
+                    }catch (Exception exe){
+                        context.response().setStatusCode(500).end(exe.getMessage());
                     }
 
                 }
 
+                //
                 // Fetch our QueryParam
                 QueryParam queryParam = params[i].getAnnotation(QueryParam.class);
                 if (processQueryParam(queryParam, params[i].getClass()) != null) {
 
-                    if (params[i].getType() == String.class) {
-                        objInv[i] = new String(context.request().getParam(params[i].getName()));
-                    }
-                    if (params[i].getType() == Integer.class) {
-                        objInv[i] = new Integer(context.request().getParam(params[i].getName()));
+                    try {
+                        //
+                        if (params[i].getType() == String.class) {
+                            objInv[i] = context.request().params().get(queryParam.name());
+                        }
+                        else if (params[i].getType() == Integer.class) {
+                            objInv[i] = Integer.valueOf(context.request().params().get(pathParam.name()));
+                        }
+                    }catch (Exception exe){
+                        exe.printStackTrace();
+                        context.response().setStatusCode(500).end("Invalid Query Param");
                     }
 
                 }
 
+                //
                 // Fetch our HeaderParam
                 HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
                 if (processHeaderParam(headerParam, params[i].getClass()) != null) {
 
-                    if (params[i].getType() == String.class) {
-                        objInv[i] = new String(context.request().getParam(params[i].getName()));
-                    }
-                    if (params[i].getType() == Integer.class) {
-                        objInv[i] = new Integer(context.request().getParam(params[i].getName()));
-                    }
+                    context.response().setStatusCode(500).end("Not Implemented");
+
                 }
 
                 if (params[i].getType() == RoutingContext.class) {
@@ -135,18 +136,14 @@ public class InvocationImplementation implements InvocationInterface{
                 }
             }
 
-            System.out.println("");
             // Handle reflections based call from Route.class object
+            //
             try {
 
                 // Proccess each class for each value
                 Class<?> paramsInv[] = new Class[objInv.length];
                 for (int uu = 0; uu < objInv.length; uu++) {
-
-                    System.out.println("HERE IS OUR TYPE --------------------------------");
-                    System.out.println((params[uu].getType()));
                     paramsInv[uu] = params[uu].getType();
-
                 }
                 // Set names from annotation to invoke
                 String methodName = e.getInvokeMethod().getName(); // methodname to be invoked
@@ -161,7 +158,9 @@ public class InvocationImplementation implements InvocationInterface{
                 Object isVoid = myMethod.invoke(_instance, objInv);
                 // If return type of invoked function is null we assume that return logic is handeled via the invoked function
                 if(isVoid != null){
-                    context.response().end(Json.encode(myMethod.invoke(_instance, objInv)));
+                    context.response().end(
+                            Json.encodePrettily(myMethod.invoke(_instance, objInv))
+                    );
                 }
             }catch (Exception er){
                 er.printStackTrace();

@@ -1,5 +1,6 @@
 package org.fandanzle.annovtexrest;
 
+import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
@@ -21,10 +22,8 @@ import io.vertx.ext.web.RoutingContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +32,8 @@ import java.util.regex.Pattern;
  * Created by alexb on 28/10/2016.
  */
 public class AnnoVtexRest {
+
+    private static final Map<Class<?>, Function<String, Object>> adapters = new HashMap<>();
 
     private static Logger logger = Logger.getLogger(AnnoVtexRest.class);
     private Vertx vertx;
@@ -230,133 +231,6 @@ public class AnnoVtexRest {
         return this.routes;
     }
 
-
-    /**
-     *
-     * @param packageName
-     * @return
-     */
-    public AnnoVtexRest buildClazz(String packageName) {
-
-        System.out.println("============================================");
-        System.out.println("Package Name");
-        System.out.println(packageName);
-        System.out.println("============================================");
-
-        Reflections reflections = new Reflections(packageName);
-        // Fetch all classes that have the ProviderTypeAnnotation.class annotation
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(RequestMapping.class);
-        // Iterate
-        for(Class<?> ii :annotated) {
-            this.handleController(ii);
-        }
-
-        return this;
-    }
-
-    /**
-     *
-     *
-     */
-    private void handleController(Class<?> controllerClazz){
-
-        // Get our Annotation and type check
-        Annotation ano = controllerClazz.getAnnotation(RequestMapping.class);
-
-        System.out.println("------------------------------------------------------");
-        System.out.println("Caniconial Name   : " + controllerClazz.getCanonicalName());
-        System.out.println("Our Annotation : " +  ano);
-
-        // Check annotation is instance of ProviderTypeAnnotation.class
-        if (ano instanceof RequestMapping) {
-
-            System.out.println("============================================");
-            System.out.println("Request Mapping URI   : " + ((RequestMapping) ano).uri()[0]);
-
-            Method[] methods = controllerClazz.getDeclaredMethods();
-
-            for(Method method : methods){
-                //this.handleMethod(method);
-            }
-
-        }
-        else{
-
-        }
-
-    }
-
-    /**
-     *
-     * @param controllerMethod
-     */
-    private Parameter[] handleMethod(Method controllerMethod){
-
-        List<String> headerParams = new ArrayList<>();
-        List<String> queryParams = new ArrayList<>();
-        List<String> routeParams = new ArrayList<>();
-
-        System.out.println(controllerMethod.getName());
-        RequestMapping unique = controllerMethod.getAnnotation(RequestMapping.class);
-
-        if (unique != null) {
-
-            System.out.println("------------------------------------------------------");
-            System.out.println("Method name : " + controllerMethod.getName());
-            System.out.println(unique.consumes());
-            System.out.println(unique.produces());
-            System.out.println(unique.description());
-            System.out.println(unique.method()[0]);
-            System.out.println(unique.noCache());
-            System.out.println(((RequestMapping) unique).uri()[0] + unique.uri()[0]);
-
-            String dd = ((RequestMapping) unique).uri()[0] + unique.uri()[0];
-
-            Pattern p = Pattern.compile("\\{([^}]*)\\}");
-            Matcher m = p.matcher(dd);
-
-            while (m.find()) {
-                routeParams.add(m.group(1));
-            }
-
-            for(Parameter param : controllerMethod.getParameters()){
-                //this.handleParamater(param);
-            }
-
-            return controllerMethod.getParameters();
-
-        }
-        return null;
-
-    }
-
-    /**
-     *
-     * @param methodParameter
-     */
-    private void handleParamater(Parameter methodParameter){
-
-        PathParam pathParam = methodParameter.getAnnotation(PathParam.class);
-
-        if(processPathParam( pathParam, methodParameter.getClass() ) != null){
-
-        }
-
-        QueryParam queryParam = methodParameter.getAnnotation(QueryParam.class);
-
-        if(processQueryParam( queryParam, methodParameter.getClass() ) != null){
-
-        }
-
-        HeaderParam headerParam = methodParameter.getAnnotation(HeaderParam.class);
-
-        if(processQueryParam( queryParam, methodParameter.getClass() ) != null){
-
-        }
-
-    }
-
-
     /**
      * Handle all HeaderParam annotations
      * @return
@@ -440,17 +314,37 @@ public class AnnoVtexRest {
     }
 
     /**
-     * Get all values from vertx
-     * @param vertx
+     *
+     * @param parameterClass
+     * @param handler
      */
-    private void handleRequestParams(RoutingContext vertx){
-        prepareParameters(vertx.request().formAttributes());
-        prepareParameters(vertx.request().headers());
-        prepareParameters(vertx.request().params());
-        vertx.request().absoluteURI();
-        vertx.request().method().toString();
-        vertx.getAcceptableContentType();
+    public void registerHandler(Class<?> parameterClass, Handler<RoutingContext> handler) {
     }
 
+    /**
+     *
+     * @param parameterClass
+     * @param handler
+     */
+    public void registerMarshaller(Class<?> parameterClass, Handler<RoutingContext> handler) {
+    }
+
+    /**
+     *
+     * @param type
+     */
+    public void registerTypeProcessor(Class<?> type) {
+        //config.registerTypeProcessor(type, processor);
+    }
+
+    /**
+     *
+     * @param annotation
+     * @param handler
+     * @param <T>
+     */
+    public <T extends Annotation> void registerAnnotationProcessor(Class<T> annotation, Handler<RoutingContext> handler) {
+
+    }
 
 }
