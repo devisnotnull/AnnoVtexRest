@@ -1,7 +1,6 @@
 package org.fandanzle.annovtexrest.entity;
 
-import org.fandanzle.annovtexrest.MimeTypes;
-import org.fandanzle.annovtexrest.annotation.RequestMapping;
+import org.fandanzle.annovtexrest.MimeType;
 import org.fandanzle.annovtexrest.annotation.RequestMethods;
 
 import java.lang.reflect.Method;
@@ -30,9 +29,9 @@ public class Route {
 
     private List<String> uriBreakDown;
 
-    private MimeTypes consumes;
+    private MimeType consumes;
 
-    private MimeTypes produces;
+    private MimeType produces;
 
     private String description;
 
@@ -128,20 +127,20 @@ public class Route {
         return this;
     }
 
-    public MimeTypes getConsumes() {
+    public MimeType getConsumes() {
         return consumes;
     }
 
-    public Route setConsumes(MimeTypes consumes) {
+    public Route setConsumes(MimeType consumes) {
         this.consumes = consumes;
         return this;
     }
 
-    public MimeTypes getProduces() {
+    public MimeType getProduces() {
         return produces;
     }
 
-    public Route setProduces(MimeTypes produces) {
+    public Route setProduces(MimeType produces) {
         this.produces = produces;
         return this;
     }

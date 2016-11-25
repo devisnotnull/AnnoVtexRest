@@ -4,9 +4,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
-import org.fandanzle.annovtexrest.MimeTypes;
+import org.fandanzle.annovtexrest.MimeType;
 import org.fandanzle.annovtexrest.annotation.*;
-import org.fandanzle.annovtexrest.annotation.http.GET;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +24,7 @@ public class MockUsersController {
     @RequestMapping(
             uri = "/all",
             method = RequestMethods.GET,
-            produces = MimeTypes.APPLICATION_JSON,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
     public List<String> getAllUsers(
@@ -46,7 +45,7 @@ public class MockUsersController {
     @RequestMapping(
             uri = "/users/:param1/:param2",
             method = RequestMethods.GET,
-            produces = MimeTypes.APPLICATION_JSON,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get a specific user with another paramter for refinement"
     )
     public String getSingleUser(

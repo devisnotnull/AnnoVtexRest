@@ -4,19 +4,15 @@ import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
-import jdk.internal.dynalink.support.Guards;
 import org.apache.log4j.Logger;
-
 import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.annotation.auth.Guard;
 import org.fandanzle.annovtexrest.authz.AuthzHandlerInterface;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
-
 import org.reflections.Reflections;
 import io.vertx.ext.web.RoutingContext;
 import java.lang.annotation.Annotation;
@@ -24,14 +20,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
  * Created by alexb on 28/10/2016.
  */
 public class AnnoVtexRest {
+
+    private HashMap<MimeType, Class<?>> marshallerConfig = new HashMap<>();
+    private HashMap<Class<?>, Class<?>> typeProcessorConfig = new HashMap<>();
+    private HashMap<Annotation, Class<?>> annotationProcessorConfig = new HashMap<>();
+
 
     private static final Map<Class<?>, Function<String, Object>> adapters = new HashMap<>();
 
@@ -214,7 +212,6 @@ public class AnnoVtexRest {
         return this;
     }
 
-
     /**
      * Get the Vert.x router used in context of this instance
      * @return
@@ -313,28 +310,23 @@ public class AnnoVtexRest {
 
     }
 
-    /**
-     *
-     * @param parameterClass
-     * @param handler
-     */
-    public void registerHandler(Class<?> parameterClass, Handler<RoutingContext> handler) {
-    }
 
     /**
      *
-     * @param parameterClass
+     * @param mime
+     * @param marshaller
      * @param handler
      */
-    public void registerMarshaller(Class<?> parameterClass, Handler<RoutingContext> handler) {
+    public void registerMarshaller(MimeType mime, Class<?> marshaller) {
+        marshallerConfig.put(mime, marshaller);
     }
 
     /**
      *
      * @param type
      */
-    public void registerTypeProcessor(Class<?> type) {
-        //config.registerTypeProcessor(type, processor);
+    public void registerTypeProcessor(Class<?> type, Class<?> processor) {
+        typeProcessorConfig.put(type,processor);
     }
 
     /**
@@ -343,8 +335,8 @@ public class AnnoVtexRest {
      * @param handler
      * @param <T>
      */
-    public <T extends Annotation> void registerAnnotationProcessor(Class<T> annotation, Handler<RoutingContext> handler) {
-
+    public void registerAnnotationProcessor(Annotation annotation,Class<?> processor) {
+        annotationProcessorConfig.put(annotation, processor);
     }
 
 }

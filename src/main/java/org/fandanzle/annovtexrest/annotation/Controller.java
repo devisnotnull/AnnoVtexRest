@@ -1,6 +1,6 @@
 package org.fandanzle.annovtexrest.annotation;
 
-import org.fandanzle.annovtexrest.MimeTypes;
+import org.fandanzle.annovtexrest.MimeType;
 
 import java.lang.annotation.*;
 
@@ -18,9 +18,9 @@ public @interface Controller {
 
     String description() default "no description";
 
-    MimeTypes consumes() default MimeTypes.APPLICATION_HTML;
+    MimeType consumes() default MimeType.APPLICATION_HTML;
 
-    MimeTypes produces() default MimeTypes.APPLICATION_JSON;
+    MimeType produces() default MimeType.APPLICATION_JSON;
 
     String charset() default "UTF-8";
 

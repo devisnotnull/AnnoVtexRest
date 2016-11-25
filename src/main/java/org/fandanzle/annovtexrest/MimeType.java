@@ -3,7 +3,7 @@ package org.fandanzle.annovtexrest;
 /**
  * Created by alexb on 28/10/2016.
  */
-public enum MimeTypes {
+public enum MimeType {
 
     APPLICATION_HTML("text/html"),
 
@@ -15,7 +15,7 @@ public enum MimeTypes {
 
     private String mime;
 
-    MimeTypes(String grantType) {
+    MimeType(String grantType) {
         this.mime = grantType;
     }
 

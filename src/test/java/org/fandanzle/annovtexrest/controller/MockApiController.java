@@ -4,12 +4,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
-import org.fandanzle.annovtexrest.MimeTypes;
+import org.fandanzle.annovtexrest.MimeType;
 import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.annotation.processors.After;
 import org.fandanzle.annovtexrest.annotation.processors.Before;
 
-import javax.annotation.concurrent.GuardedBy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -62,8 +61,8 @@ public class MockApiController {
     @RequestMapping(
             uri = "/users/:flhwgfo/:weofhweoufhowef/:wejfhweufweif",
             method = RequestMethods.GET,
-            consumes = MimeTypes.APPLICATION_HTML,
-            produces = MimeTypes.APPLICATION_JSON,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
     public List<String> getAllUsers(
@@ -86,8 +85,8 @@ public class MockApiController {
     @RequestMapping(
             uri = "/users/:id/:id1/:id2",
             method = RequestMethods.GET,
-            consumes = MimeTypes.APPLICATION_HTML,
-            produces = MimeTypes.APPLICATION_JSON,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to a specific user by there name"
     )
     public List<String> getUserByName(

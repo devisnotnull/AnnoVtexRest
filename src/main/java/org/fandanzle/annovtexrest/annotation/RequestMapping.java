@@ -1,9 +1,8 @@
 package org.fandanzle.annovtexrest.annotation;
 
-import org.fandanzle.annovtexrest.MimeTypes;
+import org.fandanzle.annovtexrest.MimeType;
 
 import java.lang.annotation.*;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Generic mapping annotation
@@ -19,9 +18,9 @@ public @interface RequestMapping {
 
     String description() default "no description";
 
-    MimeTypes consumes() default MimeTypes.APPLICATION_HTML;
+    MimeType consumes() default MimeType.APPLICATION_HTML;
 
-    MimeTypes produces() default MimeTypes.APPLICATION_JSON;
+    MimeType produces() default MimeType.APPLICATION_JSON;
 
     String charset() default "UTF-8";
 

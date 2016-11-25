@@ -5,11 +5,10 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import org.fandanzle.annovtexrest.MimeTypes;
+import org.fandanzle.annovtexrest.MimeType;
 import org.fandanzle.annovtexrest.annotation.*;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,8 +27,8 @@ public class MockSimpleController {
     @RequestMapping(
             uri = "/all",
             method = RequestMethods.POST,
-            consumes = MimeTypes.APPLICATION_HTML,
-            produces = MimeTypes.APPLICATION_JSON,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
     public JsonObject post(
@@ -58,8 +57,8 @@ public class MockSimpleController {
     @RequestMapping(
             uri = "/test",
             method = RequestMethods.POST,
-            consumes = MimeTypes.APPLICATION_HTML,
-            produces = MimeTypes.APPLICATION_JSON,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
     public void postTest(
@@ -87,8 +86,8 @@ public class MockSimpleController {
     @RequestMapping(
             uri = "/all",
             method = RequestMethods.GET,
-            consumes = MimeTypes.APPLICATION_HTML,
-            produces = MimeTypes.APPLICATION_JSON,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
     public List<String> get(
@@ -117,8 +116,8 @@ public class MockSimpleController {
     @RequestMapping(
             uri = "/all",
             method = RequestMethods.DELETE,
-            consumes = MimeTypes.APPLICATION_HTML,
-            produces = MimeTypes.APPLICATION_JSON,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
     public String delete(
