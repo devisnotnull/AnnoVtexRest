@@ -30,18 +30,14 @@ public class MainVerticle extends AbstractVerticle {
      */
     @Override
     public void start() {
-
         try{
             annoVtexRest = new AnnoVtexRest(vertx);
             annoVtexRest.build("org.fandanzle.annovtexrest.example.controller.api");
             router = annoVtexRest.getRouter();
-
+            vertx.createHttpServer().requestHandler(router::accept).listen(8000);
         }catch (Exception e){
-
+            e.printStackTrace();
         }
-
-        vertx.createHttpServer().requestHandler(router::accept).listen(8000);
-
     }
 
 
