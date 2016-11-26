@@ -158,42 +158,78 @@ public class AnnoVtexRest {
 
                             if(pp[i].getAnnotations().length > 0) {
 
-                                if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
+                                //
+                                //
+                                // Path params to be pulled for URI
+                                PathParam pathParam = pp[i].getAnnotation(PathParam.class);
 
-                                    // Path params to be pulled for URI
-                                    PathParam pathParam = pp[i].getAnnotation(PathParam.class);
-                                    if (processPathParam(pathParam, pp[i].getClass()) != null) {
+                                if (processPathParam(pathParam, pp[i].getClass()) != null) {
+
+                                    if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
                                         org.fandanzle.annovtexrest.entity.PathParam pathParam1 = new org.fandanzle.annovtexrest.entity.PathParam();
                                         pathParam1.setClazz(pp[i].getType().getClass());
                                         pathParam1.setName(pathParam.name());
                                         System.out.println(route.getRequiredPathParams());
                                         route.getRequiredPathParams().add(pathParam1);
-                                    }
 
-                                    // Query params to be pulled from the URI
-                                    QueryParam queryParam = pp[i].getAnnotation(QueryParam.class);
-                                    if (processQueryParam(queryParam, pp[i].getClass()) != null) {
+                                    } else
+                                        throw new Exception("Invalid parameter type, You can only use String and Interger types");
+                                }
+
+                                //
+                                //
+                                // Query params to be pulled from the URI
+                                QueryParam queryParam = pp[i].getAnnotation(QueryParam.class);
+
+                                if (processQueryParam(queryParam, pp[i].getClass()) != null) {
+
+                                    if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
+
                                         org.fandanzle.annovtexrest.entity.QueryParam queryParam1 = new org.fandanzle.annovtexrest.entity.QueryParam();
                                         queryParam1.setClazz(pp[i].getType().getClass());
                                         queryParam1.setName(queryParam.name());
                                         queryParam1.setRequired(queryParam.required());
                                         route.getRequiredQueryParams().add(queryParam1);
-                                    }
 
-                                    // Header params to be pulled from URI
-                                    HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
-                                    if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
+                                    }
+                                }
+
+                                //
+                                //
+                                // Header params to be pulled from URI
+                                HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
+
+                                if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
+
+                                    if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
+
+                                        org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
+                                        headerParam1.setClazz(pp[i].getType().getClass());
+                                        headerParam1.setName(headerParam.name());
+                                        route.getRequiredHeaders().add(headerParam1);
+
+                                    }
+                                }
+
+                                //
+                                //
+                                // Header params to be pulled from URI
+                                Context contextParam = pp[i].getAnnotation(Context.class);
+
+                                if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
+
+                                    if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
+
                                         org.fandanzle.annovtexrest.entity.HeaderParam headerParam1 = new org.fandanzle.annovtexrest.entity.HeaderParam();
                                         headerParam1.setClazz(pp[i].getType().getClass());
                                         headerParam1.setName(headerParam.name());
                                         route.getRequiredHeaders().add(headerParam1);
                                     }
+                                }
 
-                                    // TODO implement cookie annotation, I know cookies are pulled from the header,
-                                    // But having seperate logic keeps it cleaner
+                                // TODO implement cookie annotation, I know cookies are pulled from the header,
+                                // But having seperate logic keeps it cleaner
 
-                                } else
-                                    throw new Exception("Invalid parameter type, You can only use String and Interger types");
                             }
                         }
                         // Add to class scoped var

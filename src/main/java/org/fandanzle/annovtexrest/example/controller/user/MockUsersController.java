@@ -29,10 +29,10 @@ public class MockUsersController {
             description = "An endpoint to get all users"
     )
     public List<String> getAllUsers(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
         List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
         return arr;
@@ -49,10 +49,10 @@ public class MockUsersController {
             description = "An endpoint to get a specific user with another paramter for refinement"
     )
     public JsonObject getSingleUser(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context,
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context,
             @PathParam(name="param1") Integer param1,
             @PathParam(name="param2") Integer param2,
             @PathParam(name="param3") String param3,

@@ -6,6 +6,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.MimeType;
+import org.fandanzle.annovtexrest.annotation.Context;
 import org.fandanzle.annovtexrest.annotation.Controller;
 import org.fandanzle.annovtexrest.annotation.RequestMapping;
 import org.fandanzle.annovtexrest.annotation.RequestMethods;
@@ -34,17 +35,15 @@ public class MockSimpleController {
             description = "An endpoint to get all users"
     )
     public JsonObject post(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
 
         System.out.println("-------------------------------------------------");
         System.out.println("POST");
-        System.out.println(context.request().method().name());
-        System.out.println(context.getBodyAsString());
-        System.out.println(context.getBody());
+
 
         return context.getBodyAsJson();
 
@@ -64,10 +63,10 @@ public class MockSimpleController {
             description = "An endpoint to get all users"
     )
     public void postTest(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
 
         System.out.println("-------------------------------------------------");
@@ -93,10 +92,10 @@ public class MockSimpleController {
             description = "An endpoint to get all users"
     )
     public List<String> get(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context  Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
 
         List<String> arr = Arrays.asList("111111","222222","3333","44444444","efoihwefouwehf","wpifnrwiofn");
@@ -123,10 +122,10 @@ public class MockSimpleController {
             description = "An endpoint to get all users"
     )
     public String delete(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
 
         System.out.println("-------------------------------------------------");

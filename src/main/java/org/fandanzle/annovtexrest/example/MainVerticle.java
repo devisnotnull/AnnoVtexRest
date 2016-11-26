@@ -33,33 +33,13 @@ public class MainVerticle extends AbstractVerticle {
 
         try{
             annoVtexRest = new AnnoVtexRest(vertx);
-
-            annoVtexRest.build("org.fandanzle.annovtexrest.example.controller");
-
-            System.out.println("////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            System.out.println("DONE WITH BUILD");
-
+            annoVtexRest.build("org.fandanzle.annovtexrest.example.controller.api");
             router = annoVtexRest.getRouter();
-
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-            System.out.println("=================================");
-
-            System.out.println(Json.encode(annoVtexRest.getRouter().getRoutes()));
 
         }catch (Exception e){
 
         }
-        // Pass router referernce into router
-        // Build all routes for this verticle.
+
         vertx.createHttpServer().requestHandler(router::accept).listen(8000);
 
     }

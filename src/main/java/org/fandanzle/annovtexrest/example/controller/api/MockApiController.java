@@ -30,10 +30,10 @@ public class MockApiController {
      */
     @Before
     public RoutingContext before(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
 
 
@@ -51,10 +51,10 @@ public class MockApiController {
      */
     @After
     public RoutingContext after(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
         return context;
     }
@@ -76,10 +76,30 @@ public class MockApiController {
             description = "An endpoint to get all users"
     )
     public List<String> getAllUsers(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context
+
+    ){
+
+        List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
+
+        return arr;
+
+    }
+
+
+    /**
+     *
+     * @return
+     */
+
+    @RequestMapping(
+            uri = "/users/:id",
+            method = RequestMethods.GET,
+            consumes = MimeType.APPLICATION_HTML,
+            produces = MimeType.APPLICATION_JSON,
+            description = "An endpoint to a specific user by there name"
+    )
+    public List<String> getUserByName(
+            @PathParam(name = "id") Integer id1
     ){
 
         List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
@@ -105,10 +125,7 @@ public class MockApiController {
             description = "An endpoint to a specific user by there name"
     )
     public List<String> getUserByName(
-            Vertx vertx,
-            HttpServerRequest request,
-            HttpServerResponse response,
-            RoutingContext context,
+
             @CookieParam(name = "x-session-id") String cookie,
             @PathParam(name = "id1") Integer id1,
             @PathParam(name = "id2") Integer id2,
@@ -118,9 +135,9 @@ public class MockApiController {
             @QueryParam(name = "q1") String q1
     ){
 
-        List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
+            List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
 
-        return arr;
+            return arr;
 
     }
 }

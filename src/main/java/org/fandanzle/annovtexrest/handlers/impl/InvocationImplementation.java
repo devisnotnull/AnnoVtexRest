@@ -8,13 +8,11 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.fandanzle.annovtexrest.AnnoVtexRest;
-import org.fandanzle.annovtexrest.annotation.HeaderParam;
-import org.fandanzle.annovtexrest.annotation.QueryParam;
-import org.fandanzle.annovtexrest.annotation.RequestMapping;
-import org.fandanzle.annovtexrest.annotation.RequestMethods;
+import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.entity.PathParam;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
+import org.mozilla.javascript.tools.shell.JSConsole;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.reflections.Reflections;
 
@@ -52,21 +50,18 @@ public class InvocationImplementation implements InvocationInterface{
 
         if (router == null) return;
 
-        // TODO This stream logic is shite, redo
-        Stream<Route> dd = router.stream()
+        Route e = router.stream()
                 .filter(
-                    f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
-                );
+                        f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
+                ).findFirst().get();
+
+        //
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println(Json.encode(e.getUri()));
 
         // Find our route in the stream
-        if(dd.findFirst().isPresent()){
+        if(e != null){
 
-            Stream<Route> dde = router.stream()
-                    .filter(
-                            f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
-                    );
-
-            Route e = dde.findFirst().get();
             Parameter[] params = e.getParams();
             Object[] objInv = new Object[e.getParams().length];
 
@@ -85,7 +80,9 @@ public class InvocationImplementation implements InvocationInterface{
                             objInv[i] = Integer.valueOf(context.request().getParam(pathParam.name()));
                         }
                     }catch (Exception exe){
-                        context.response().setStatusCode(500).end(exe.getMessage());
+                        exe.printStackTrace();
+                        error(exe.getMessage());
+                        return;
                     }
 
                 }
@@ -105,7 +102,8 @@ public class InvocationImplementation implements InvocationInterface{
                         }
                     }catch (Exception exe){
                         exe.printStackTrace();
-                        context.response().setStatusCode(500).end("Invalid Query Param");
+                        error(exe.getMessage());
+                        return;
                     }
 
                 }
@@ -115,25 +113,36 @@ public class InvocationImplementation implements InvocationInterface{
                 HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
                 if (processHeaderParam(headerParam, params[i].getClass()) != null) {
 
-                    context.response().setStatusCode(500).end("Not Implemented");
+                    error("Header annotations Implemented");
+                    return;
 
                 }
 
-                if (params[i].getType() == RoutingContext.class) {
-                    objInv[i] = (RoutingContext) context;
+                //
+                // Fetch our HeaderParam
+                Context contextParam = params[i].getAnnotation(Context.class);
+                if (processHeaderParam(headerParam, params[i].getClass()) != null) {
+
+                    if (params[i].getType() == RoutingContext.class) {
+                        objInv[i] = (RoutingContext) context;
+                    }
+
+                    else if (params[i].getType() == Vertx.class) {
+                        objInv[i] = (Vertx) vertx;
+                    }
+
+                    else if (params[i].getType() == HttpServerRequest.class) {
+                        objInv[i] = (HttpServerRequest) context.request();
+                    }
+
+                    else if (params[i].getType() == HttpServerResponse.class) {
+                        objInv[i] = (HttpServerResponse) context.response();
+                    }
+                    else{
+                        error("Requested Clazz is not a valid context request");
+                    }
                 }
 
-                if (params[i].getType() == Vertx.class) {
-                    objInv[i] = (Vertx) vertx;
-                }
-
-                if (params[i].getType() == HttpServerRequest.class) {
-                    objInv[i] = (HttpServerRequest) context.request();
-                }
-
-                if (params[i].getType() == HttpServerResponse.class) {
-                    objInv[i] = (HttpServerResponse) context.response();
-                }
             }
 
             // Handle reflections based call from Route.class object
@@ -155,6 +164,11 @@ public class InvocationImplementation implements InvocationInterface{
                 context.response().putHeader("Content-Type", e.getProduces().name());
                 // If is void this will ignore
                 // Void checker
+                System.out.println("Here is our instance of the Reflections class");
+                System.out.println(Json.encode(_instance));
+                System.out.println("Here is the OBVS instance");
+                System.out.println(Json.encode(objInv));
+                System.out.println("Invoking the class with variables scaffold");
                 Object isVoid = myMethod.invoke(_instance, objInv);
                 // If return type of invoked function is null we assume that return logic is handeled via the invoked function
                 if(isVoid != null){
@@ -166,6 +180,7 @@ public class InvocationImplementation implements InvocationInterface{
                 er.printStackTrace();
                 context.response().setStatusCode(500).end(er.getMessage());
             }
+
         }
 
     }
@@ -339,5 +354,12 @@ public class InvocationImplementation implements InvocationInterface{
     private List<String> getQueryParam(String name){
         List<String> param = prepareParameters(context.request().params()).get(name);
         return param;
+    }
+
+    private void error(String message){
+
+        JsonObject errorCode = new JsonObject().put("error", "There was an error processing your request").put("message", message);
+        context.response().setStatusCode(500).end(Json.encodePrettily( errorCode ));
+
     }
 }
