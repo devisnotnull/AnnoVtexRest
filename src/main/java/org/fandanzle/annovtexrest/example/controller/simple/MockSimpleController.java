@@ -10,6 +10,8 @@ import org.fandanzle.annovtexrest.annotation.Context;
 import org.fandanzle.annovtexrest.annotation.Controller;
 import org.fandanzle.annovtexrest.annotation.RequestMapping;
 import org.fandanzle.annovtexrest.annotation.RequestMethods;
+import org.fandanzle.annovtexrest.annotation.processors.After;
+import org.fandanzle.annovtexrest.annotation.processors.Before;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +22,47 @@ import java.util.List;
 
 @Controller(uri = "/simple")
 public class MockSimpleController {
+
+    /**
+     * Before any route is run,
+     * Must return a handler with type routing context
+     * MUST BE VOID
+     * @param vertx
+     * @param request
+     * @param response
+     * @param context
+     */
+    @Before
+    public RoutingContext before(
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
+    ){
+
+
+        return context;
+    }
+
+    /**
+     * After a route has been run,
+     * Must return a handler with type routing context
+     * MUST BE VOID
+     * @param vertx
+     * @param request
+     * @param response
+     * @param context
+     */
+    @After
+    public RoutingContext after(
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
+    ){
+        return context;
+    }
+
 
     /**
      * USERS GENERIC CLASS

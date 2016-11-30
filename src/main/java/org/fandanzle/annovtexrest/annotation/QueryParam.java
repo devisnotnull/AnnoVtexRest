@@ -16,6 +16,8 @@ public @interface QueryParam {
 
     boolean required() default false;
 
+    String defaultValue() default "";
+
     String description() default "no description";
 
 }

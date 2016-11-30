@@ -13,6 +13,7 @@ import org.fandanzle.annovtexrest.entity.PathParam;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
 import org.mozilla.javascript.tools.shell.JSConsole;
+import org.omg.CORBA.SystemException;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.reflections.Reflections;
 
@@ -55,29 +56,43 @@ public class InvocationImplementation implements InvocationInterface{
                         f -> f.getUri().equals(context.currentRoute().getPath()) && f.getMethod().name().equals(context.request().method().name())
                 ).findFirst().get();
 
-        //
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println(Json.encode(e.getUri()));
-
         // Find our route in the stream
         if(e != null){
 
             Parameter[] params = e.getParams();
             Object[] objInv = new Object[e.getParams().length];
 
-            for(int i=0; i < e.getParams().length; i++) {
+            for(int i=0; i < (e.getParams().length); i++) {
 
+                if(params[i].getAnnotations().length == 0){
+                    error("Invalid controller declaration, A function variable has not been declared properly with an annotation");
+                    return;
+                }
+                for(int ii = 0; ii < ( params[i].getAnnotations().length ); ii++){
+                    System.out.println("ANNONTATION !!!!");
+                    System.out.println("Class : " + params[i].getAnnotations()[ii].annotationType().getClass());
+                    System.out.println("TYPE : " + params[i].getAnnotations()[ii].annotationType());
+                    System.out.println("RAW CLAZZ : " + params[i].getAnnotations()[ii].getClass());
+                    System.out.println("CAN Name : " + params[i].getAnnotations()[ii].annotationType().getCanonicalName());
+                }
                 //
                 // Fetch our PathParam
                 org.fandanzle.annovtexrest.annotation.PathParam pathParam = params[i].getAnnotation(org.fandanzle.annovtexrest.annotation.PathParam.class);
                 if (processPathParam(pathParam, params[i].getClass()) != null) {
 
+                    System.out.println("================================================================================");
+                    System.out.println("PATH PARAM =-=--------------------------------------------------------------");
+                    System.out.println("PATH PARAM VALUE : "  );
                     try {
                         if (params[i].getType() == String.class) {
                             objInv[i] = context.request().getParam(pathParam.name());
                         }
                         else if (params[i].getType() == Integer.class) {
                             objInv[i] = Integer.valueOf(context.request().getParam(pathParam.name()));
+                        }
+                        else{
+                            error("Invalid PATH Param Type : " + pathParam.name() + " : " + params[i].getType());
+                            return;
                         }
                     }catch (Exception exe){
                         exe.printStackTrace();
@@ -92,6 +107,9 @@ public class InvocationImplementation implements InvocationInterface{
                 QueryParam queryParam = params[i].getAnnotation(QueryParam.class);
                 if (processQueryParam(queryParam, params[i].getClass()) != null) {
 
+                    System.out.println("================================================================================");
+                    System.out.println("QUERY PARAM =-=--------------------------------------------------------------");
+
                     try {
                         //
                         if (params[i].getType() == String.class) {
@@ -99,6 +117,10 @@ public class InvocationImplementation implements InvocationInterface{
                         }
                         else if (params[i].getType() == Integer.class) {
                             objInv[i] = Integer.valueOf(context.request().params().get(pathParam.name()));
+                        }
+                        else{
+                            error("Invalid Query Param Type : " + queryParam.name() + " : " + params[i].getType());
+                            return;
                         }
                     }catch (Exception exe){
                         exe.printStackTrace();
@@ -113,33 +135,57 @@ public class InvocationImplementation implements InvocationInterface{
                 HeaderParam headerParam = params[i].getAnnotation(HeaderParam.class);
                 if (processHeaderParam(headerParam, params[i].getClass()) != null) {
 
-                    error("Header annotations Implemented");
-                    return;
+                    System.out.println("================================================================================");
+                    System.out.println("HEADER PARAM =-=--------------------------------------------------------------");
+                    try {
+                        //
+                        if (params[i].getType() == String.class) {
+                            objInv[i] = context.request().params().get(headerParam.name());
+                        }
+                        else{
+                            error("Invalid HEADER Param Type : " + headerParam.name() + " : " + params[i].getType());
+                            return;
+                        }
+                    }catch (Exception exe){
+                        exe.printStackTrace();
+                        error(exe.getMessage());
+                        return;
+                    }
 
                 }
 
                 //
                 // Fetch our HeaderParam
                 Context contextParam = params[i].getAnnotation(Context.class);
-                if (processHeaderParam(headerParam, params[i].getClass()) != null) {
+                if (contextParam != null) {
+                    System.out.println("================================================================================");
+                    System.out.println("CONTEXT PARAM =-=--------------------------------------------------------------");
 
                     if (params[i].getType() == RoutingContext.class) {
+                        System.out.println("------------ ROUTING CONTEXT --------------------");
                         objInv[i] = (RoutingContext) context;
                     }
 
                     else if (params[i].getType() == Vertx.class) {
+                        System.out.println("------------ VERTX CONTEXT --------------------");
+
                         objInv[i] = (Vertx) vertx;
                     }
 
                     else if (params[i].getType() == HttpServerRequest.class) {
+                        System.out.println("------------ REQUEST CONTEXT --------------------");
+
                         objInv[i] = (HttpServerRequest) context.request();
                     }
 
                     else if (params[i].getType() == HttpServerResponse.class) {
+                        System.out.println("------------ RESPONSE CONTEXT --------------------");
+
                         objInv[i] = (HttpServerResponse) context.response();
                     }
                     else{
                         error("Requested Clazz is not a valid context request");
+                        return;
                     }
                 }
 
@@ -148,6 +194,11 @@ public class InvocationImplementation implements InvocationInterface{
             // Handle reflections based call from Route.class object
             //
             try {
+
+                System.out.println("Length or angument srray : " +  objInv.length);
+                for(int i = 0; i < objInv.length; i++){
+                    System.out.println("Class iterator : " + i + " _ " + objInv[i]);
+                }
 
                 // Proccess each class for each value
                 Class<?> paramsInv[] = new Class[objInv.length];
@@ -167,14 +218,21 @@ public class InvocationImplementation implements InvocationInterface{
                 System.out.println("Here is our instance of the Reflections class");
                 System.out.println(Json.encode(_instance));
                 System.out.println("Here is the OBVS instance");
-                System.out.println(Json.encode(objInv));
                 System.out.println("Invoking the class with variables scaffold");
                 Object isVoid = myMethod.invoke(_instance, objInv);
                 // If return type of invoked function is null we assume that return logic is handeled via the invoked function
                 if(isVoid != null){
+
+                    try{
+                        Json.encodePrettily(myMethod.invoke(_instance, objInv));
+                    }catch (Exception ex){
+                        error("Unable to encode payload : " + ex.getMessage());
+                    }
+
                     context.response().end(
                             Json.encodePrettily(myMethod.invoke(_instance, objInv))
                     );
+
                 }
             }catch (Exception er){
                 er.printStackTrace();
@@ -356,6 +414,10 @@ public class InvocationImplementation implements InvocationInterface{
         return param;
     }
 
+    /**
+     *
+     * @param message
+     */
     private void error(String message){
 
         JsonObject errorCode = new JsonObject().put("error", "There was an error processing your request").put("message", message);

@@ -27,6 +27,42 @@
         <main.verticle>org.fandanzle.annovtexrest.example.MainVerticle</main.verticle>
     </properties>
 
+
+    <repositories>
+
+        <repository>
+            <id>nexus</id>
+            <name>Internal Releases</name>
+            <url>http://192.168.61.133:8081/content/repositories/releases/</url>
+        </repository>
+
+        <repository>
+            <id>snap</id>
+            <name>Internal Releases</name>
+            <url>http://192.168.61.133:8081/content/repositories/snapshots/</url>
+        </repository>
+
+    </repositories>
+
+    <distributionManagement>
+
+        <repository>
+            <id>nexus</id>
+            <name>Internal Releases</name>
+            <url>http://192.168.61.133:8081/content/repositories/releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Internal Snapshots</name>
+            <url>http://192.168.61.133:8081/content/repositories/snapshots</url>
+        </snapshotRepository>
+
+    </distributionManagement>
+
+
+
+
     <!-- Securedata's Developers -->
     <developers>
 

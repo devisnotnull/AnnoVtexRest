@@ -3,7 +3,9 @@ package org.fandanzle.annovtexrest.example.controller.api;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.impl.CookieImpl;
 import org.fandanzle.annovtexrest.MimeType;
 import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.annotation.auth.Guard;
@@ -11,7 +13,9 @@ import org.fandanzle.annovtexrest.annotation.processors.After;
 import org.fandanzle.annovtexrest.annotation.processors.Before;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by alexb on 28/10/2016.
@@ -20,54 +24,9 @@ import java.util.List;
 public class MockApiController {
 
     /**
-     * Before any route is run,
-     * Must return a handler with type routing context
-     * MUST BE VOID
-     * @param vertx
-     * @param request
-     * @param response
-     * @param context
-     */
-    @Before
-    public RoutingContext before(
-            @Context Vertx vertx,
-            @Context HttpServerRequest request,
-            @Context HttpServerResponse response,
-            @Context RoutingContext context
-    ){
-
-
-        return context;
-    }
-
-    /**
-     * After a route has been run,
-     * Must return a handler with type routing context
-     * MUST BE VOID
-     * @param vertx
-     * @param request
-     * @param response
-     * @param context
-     */
-    @After
-    public RoutingContext after(
-            @Context Vertx vertx,
-            @Context HttpServerRequest request,
-            @Context HttpServerResponse response,
-            @Context RoutingContext context
-    ){
-        return context;
-    }
-
-    /**
      *
      * @return
      */
-    @Guard(
-            scopes= {
-                    "support_account.READ"
-            }
-    )
     @RequestMapping(
             uri = "/users",
             method = RequestMethods.GET,
@@ -75,13 +34,21 @@ public class MockApiController {
             produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to get all users"
     )
-    public List<String> getAllUsers(
-
+    public HashMap<String,Object> getAllUsers(
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context
     ){
 
-        List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
 
-        return arr;
+        HashMap<String,Object> params = new HashMap<>();
+
+        params.put("path", context.currentRoute().getPath());
+        params.put("http-method", context.request().method().name());
+
+        return params;
+
 
     }
 
@@ -92,19 +59,24 @@ public class MockApiController {
      */
 
     @RequestMapping(
-            uri = "/users/:id",
+            uri = "/users/:id1",
             method = RequestMethods.GET,
             consumes = MimeType.APPLICATION_HTML,
             produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to a specific user by there name"
     )
-    public List<String> getUserByName(
-            @PathParam(name = "id") Integer id1
+    public HashMap<String,Object> getUserByName(
+            @Context RoutingContext context,
+            @PathParam(name = "id1") Integer id1
     ){
 
-        List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
+        HashMap<String,Object> params = new HashMap<>();
 
-        return arr;
+        params.put("path", context.currentRoute().getPath());
+        params.put("http-method", context.request().method().name());
+        params.put("id1", id1);
+
+        return params;
 
     }
 
@@ -118,7 +90,7 @@ public class MockApiController {
             }
     )
     @RequestMapping(
-            uri = "/users/:id/:id1/:id2",
+            uri = "/users/:id1/:id2",
             method = RequestMethods.GET,
             consumes = MimeType.APPLICATION_HTML,
             produces = MimeType.APPLICATION_JSON,
@@ -132,7 +104,6 @@ public class MockApiController {
             @CookieParam(name = "x-session-id") String cookie,
             @PathParam(name = "id1") Integer id1,
             @PathParam(name = "id2") Integer id2,
-            @PathParam(name = "id3") Integer id3,
             @HeaderParam(name = "h1") Integer h1 ,
             @HeaderParam(name = "h2") String h2,
             @QueryParam(name = "q1") String q1
@@ -146,7 +117,7 @@ public class MockApiController {
 
 
     @RequestMapping(
-            uri = "/users/:id/:id1/:id2",
+            uri = "/users/:id1/:id2/:id3",
             method = RequestMethods.GET,
             consumes = MimeType.APPLICATION_HTML,
             produces = MimeType.APPLICATION_JSON,
