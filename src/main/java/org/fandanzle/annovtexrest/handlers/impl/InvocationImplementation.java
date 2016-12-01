@@ -153,6 +153,11 @@ public class InvocationImplementation implements InvocationInterface{
                 Form formParam = params[i].getAnnotation(Form.class);
                 if (headerParam != null) {
 
+                    if(e.getMethod() != RequestMethods.POST || e.getMethod() != RequestMethods.PUT){
+                        error("A @Body variable can only be injected with POST and PUT requests");
+                        return;
+                    }
+                    
                     try {
 
                         //
@@ -176,6 +181,11 @@ public class InvocationImplementation implements InvocationInterface{
                 // TODO implement class injectors to delegate to Interface enforced classed
                 Body bodyParam = params[i].getAnnotation(Body.class);
                 if (bodyParam != null) {
+
+                    if(e.getMethod() != RequestMethods.POST || e.getMethod() != RequestMethods.PUT){
+                        error("A @Body variable can only be injected with POST and PUT requests");
+                        return;
+                    }
 
                     try {
 
