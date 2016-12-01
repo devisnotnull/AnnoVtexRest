@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.annotation.auth.Guard;
 import org.fandanzle.annovtexrest.authz.AuthzHandlerInterface;
+import org.fandanzle.annovtexrest.entity.BodyParams;
 import org.fandanzle.annovtexrest.entity.Route;
 import org.fandanzle.annovtexrest.handlers.InvocationInterface;
 import org.reflections.Reflections;
@@ -133,24 +134,6 @@ public class AnnoVtexRest {
                         route.setMethod(unique.method()[0]);
                         route.setParams(pp);
 
-                        // Handle different HTTP request types
-                        // TODO implement all HTTP request types
-                        // TODO delegate to seperate function
-                        if(unique.method()[0] == RequestMethods.GET){
-                            router.get(uri).handler(InvocationInterface.create());
-                        }else if(unique.method()[0] == RequestMethods.POST) {
-                            // Required for Json uploads
-                            router.route().handler(BodyHandler.create());
-                            router.post(uri).handler(e->{
-                                e.next();
-                            });
-                            router.post(uri).handler(InvocationInterface.create());
-                            router.options(uri).handler(InvocationInterface.create());
-                        }else if(unique.method()[0] == RequestMethods.DELETE) {
-                            router.delete(uri).handler(InvocationInterface.create());
-                        }else if(unique.method()[0] == RequestMethods.OPTIONS) {
-                            router.options(uri).handler(InvocationInterface.create());
-                        }
 
                         // Iterate all parameters of method, We need to evaulate the params
                         // to work out the objects to inject into functions
@@ -198,7 +181,6 @@ public class AnnoVtexRest {
                                 //
                                 // Header params to be pulled from URI
                                 HeaderParam headerParam = pp[i].getAnnotation(HeaderParam.class);
-
                                 if (processHeaderParam(headerParam, pp[i].getClass()) != null) {
 
                                     if (pp[i].getType() == Integer.class || pp[i].getType() == String.class) {
@@ -209,6 +191,22 @@ public class AnnoVtexRest {
                                         route.getRequiredHeaders().add(headerParam1);
 
                                     }
+                                }
+
+                                //
+                                // Process body params
+                                // Header params to be pulled from URI
+                                Body body = pp[i].getAnnotation(Body.class);
+                                if (processBodyParam(body, pp[i].getClass()) != null) {
+                                    route.getRequiredBodyParams().add(processBodyParam(body, pp[i].getClass()));
+                                }
+
+                                //
+                                // Process Form params
+                                // Header params to be pulled from URI
+                                FormParam formParam = pp[i].getAnnotation(FormParam.class);
+                                if (processFormParam(formParam, pp[i].getClass()) != null) {
+                                    route.getRequiredFormParams().add(processFormParam(formParam, pp[i].getClass()));
                                 }
 
                                 //
@@ -232,6 +230,35 @@ public class AnnoVtexRest {
 
                             }
                         }
+
+                        // Handle different HTTP request types
+                        // TODO implement all HTTP request types
+                        // TODO delegate to seperate function
+                        if(unique.method()[0] == RequestMethods.GET){
+
+                            router.get(uri).handler(InvocationInterface.create());
+
+                        }else if(unique.method()[0] == RequestMethods.POST) {
+
+                            // Required for Json uploads
+                            router.route().handler(BodyHandler.create());
+                            router.post(uri).handler(e->{
+                                e.next();
+                            });
+                            router.post(uri).handler(InvocationInterface.create());
+                            router.options(uri).handler(InvocationInterface.create());
+
+                        }else if(unique.method()[0] == RequestMethods.DELETE) {
+
+                            router.delete(uri).handler(InvocationInterface.create());
+
+                        }else if(unique.method()[0] == RequestMethods.OPTIONS) {
+
+                            router.options(uri).handler(InvocationInterface.create());
+
+                        }
+
+
                         // Add to class scoped var
                         routes.add(route);
                         routers.add(route);
@@ -297,6 +324,42 @@ public class AnnoVtexRest {
             org.fandanzle.annovtexrest.entity.QueryParam param = new org.fandanzle.annovtexrest.entity.QueryParam();
             param.setName(anno.name());
             param.setDescription(anno.description());
+            param.setClazz(clazz);
+            return param;
+
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle all QueryParam annotations
+     * @return
+     */
+    private org.fandanzle.annovtexrest.entity.BodyParams processBodyParam(Body anno, Class clazz){
+
+        if(anno != null){
+            System.out.println("BODY PARAM");
+
+            org.fandanzle.annovtexrest.entity.BodyParams param = new org.fandanzle.annovtexrest.entity.BodyParams();
+            param.setClazz(clazz);
+            return param;
+
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle all QueryParam annotations
+     * @return
+     */
+    private org.fandanzle.annovtexrest.entity.FormParams processFormParam(FormParam anno, Class clazz){
+
+        if(anno != null){
+            System.out.println("FORM PARAM");
+
+            org.fandanzle.annovtexrest.entity.FormParams param = new org.fandanzle.annovtexrest.entity.FormParams();
             param.setClazz(clazz);
             return param;
 

@@ -11,11 +11,10 @@ import org.fandanzle.annovtexrest.annotation.*;
 import org.fandanzle.annovtexrest.annotation.auth.Guard;
 import org.fandanzle.annovtexrest.annotation.processors.After;
 import org.fandanzle.annovtexrest.annotation.processors.Before;
+import org.fandanzle.annovtexrest.example.entity.User;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.time.DateTimeException;
+import java.util.*;
 
 /**
  * Created by alexb on 28/10/2016.
@@ -38,20 +37,85 @@ public class MockApiController {
             @Context Vertx vertx,
             @Context HttpServerRequest request,
             @Context HttpServerResponse response,
-            @Context RoutingContext context
+            @Context RoutingContext context,
+            String wefohwfouwhg
     ){
 
 
         HashMap<String,Object> params = new HashMap<>();
-
+        Date dateTime = new Date();
         params.put("path", context.currentRoute().getPath());
         params.put("http-method", context.request().method().name());
+        params.put("generated", dateTime.toString());
+
 
         return params;
 
 
     }
 
+
+    /**
+     *
+     * @return
+     */
+    @RequestMapping(
+            uri = "/users/createjson",
+            method = RequestMethods.POST,
+            consumes = MimeType.APPLICATION_JSON,
+            produces = MimeType.APPLICATION_JSON,
+            description = "An endpoint to get all users"
+    )
+    public String createUserJson(
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context,
+            @Body String user
+    ){
+
+        HashMap<String,Object> params = new HashMap<>();
+        Date dateTime = new Date();
+        params.put("path", context.currentRoute().getPath());
+        params.put("http-method", context.request().method().name());
+        params.put("generated", dateTime.toString());
+        params.put("json:input", user);
+
+
+        return "created user";
+
+    }
+
+    /**
+     *
+     * @return
+     */
+    @RequestMapping(
+            uri = "/users/createform",
+            method = RequestMethods.POST,
+            consumes = MimeType.APPLICATION_JSON,
+            produces = MimeType.X_FORM_ENCODED,
+            description = "An endpoint to get all users"
+    )
+    public HashMap<String,Object> createUserForm(
+            @Context Vertx vertx,
+            @Context HttpServerRequest request,
+            @Context HttpServerResponse response,
+            @Context RoutingContext context,
+            @Form String user
+    ){
+
+        HashMap<String,Object> params = new HashMap<>();
+        Date dateTime = new Date();
+        params.put("path", context.currentRoute().getPath());
+        params.put("http-method", context.request().method().name());
+        params.put("generated", dateTime.toString());
+        params.put("form:input", user);
+
+
+        return params;
+
+    }
 
     /**
      *
@@ -67,14 +131,20 @@ public class MockApiController {
     )
     public HashMap<String,Object> getUserByName(
             @Context RoutingContext context,
-            @PathParam(name = "id1") Integer id1
+            @PathParam(name = "id1") Integer id1,
+            @QueryParam(name = "q1", defaultValue = "45") Integer q1,
+            @QueryParam(name = "q2", defaultValue = "45") Integer q2
+
+
     ){
 
         HashMap<String,Object> params = new HashMap<>();
-
+        Date dateTime = new Date();
         params.put("path", context.currentRoute().getPath());
         params.put("http-method", context.request().method().name());
         params.put("id1", id1);
+        params.put("generated", dateTime.toString());
+
 
         return params;
 
@@ -96,22 +166,25 @@ public class MockApiController {
             produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to a specific user by there name"
     )
-    public List<String> getUserByName(
+    public HashMap<String,Object> getUserByName(
             @Context Vertx vertx,
             @Context HttpServerRequest request,
             @Context HttpServerResponse response,
             @Context RoutingContext context,
-            @CookieParam(name = "x-session-id") String cookie,
             @PathParam(name = "id1") Integer id1,
-            @PathParam(name = "id2") Integer id2,
-            @HeaderParam(name = "h1") Integer h1 ,
-            @HeaderParam(name = "h2") String h2,
-            @QueryParam(name = "q1") String q1
+            @PathParam(name = "id2") Integer id2
     ){
 
-            List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
+        HashMap<String,Object> params = new HashMap<>();
 
-            return arr;
+        Date dateTime = new Date();
+        params.put("path", context.currentRoute().getPath());
+        params.put("http-method", context.request().method().name());
+        params.put("id1", id1);
+        params.put("id2", id1);
+        params.put("generated", dateTime.toString());
+
+        return params;
 
     }
 
@@ -123,23 +196,27 @@ public class MockApiController {
             produces = MimeType.APPLICATION_JSON,
             description = "An endpoint to a specific user by there name"
     )
-    public List<String> getList(
+    public HashMap<String,Object> getList(
             @Context Vertx vertx,
             @Context HttpServerRequest request,
             @Context HttpServerResponse response,
             @Context RoutingContext context,
-            @CookieParam(name = "x-session-id") String cookie,
             @PathParam(name = "id1") Integer id1,
             @PathParam(name = "id2") Integer id2,
-            @PathParam(name = "id3") Integer id3,
-            @HeaderParam(name = "h1") Integer h1 ,
-            @HeaderParam(name = "h2") String h2,
-            @QueryParam(name = "q1") String q1
+            @PathParam(name = "id3") Integer id3
     ){
 
-        List<String> arr = Arrays.asList("wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg","wfwrgrwgerg","efoihwefouwehf","82uf0824ufb04c8fg");
+        HashMap<String,Object> params = new HashMap<>();
+        Date dateTime = new Date();
+        params.put("path", context.currentRoute().getPath());
+        params.put("http-method", context.request().method().name());
+        params.put("id1", id1);
+        params.put("id2", id2);
+        params.put("id3", id3);
+        params.put("generated", dateTime.toString());
 
-        return arr;
+
+        return params;
 
     }
 

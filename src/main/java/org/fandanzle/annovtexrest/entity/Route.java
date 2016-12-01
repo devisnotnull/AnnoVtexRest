@@ -1,6 +1,7 @@
 package org.fandanzle.annovtexrest.entity;
 
 import org.fandanzle.annovtexrest.MimeType;
+import org.fandanzle.annovtexrest.annotation.FormParam;
 import org.fandanzle.annovtexrest.annotation.RequestMethods;
 
 import java.lang.reflect.Method;
@@ -27,6 +28,10 @@ public class Route {
 
     private List<QueryParam> requiredQueryParams = new ArrayList<>();
 
+    private List<BodyParams> requiredBodyParams = new ArrayList<>();
+
+    private List<FormParams> requiredFormParams = new ArrayList<>();
+
     private List<String> uriBreakDown;
 
     private MimeType consumes;
@@ -34,6 +39,24 @@ public class Route {
     private MimeType produces;
 
     private String description;
+
+    public List<BodyParams> getRequiredBodyParams() {
+        return requiredBodyParams;
+    }
+
+    public Route setRequiredBodyParams(List<BodyParams> requiredBodyParams) {
+        this.requiredBodyParams = requiredBodyParams;
+        return this;
+    }
+
+    public List<FormParams> getRequiredFormParams() {
+        return requiredFormParams;
+    }
+
+    public Route setRequiredFormParams(List<FormParams> requiredFormParams) {
+        this.requiredFormParams = requiredFormParams;
+        return this;
+    }
 
     private RequestMethods method;
 

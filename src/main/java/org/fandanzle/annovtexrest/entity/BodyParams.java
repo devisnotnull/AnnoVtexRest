@@ -3,7 +3,7 @@ package org.fandanzle.annovtexrest.entity;
 /**
  * Created by alexb on 30/10/2016.
  */
-public class QueryParam {
+public class BodyParams {
 
     public String name;
 
@@ -11,35 +11,13 @@ public class QueryParam {
 
     public String description;
 
-    public String defaultValue;
-
-    public boolean required;
-
     public Class clazz;
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public QueryParam setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public QueryParam setRequired(boolean required) {
-        this.required = required;
-        return this;
-    }
 
     public String getName() {
         return name;
     }
 
-    public QueryParam setName(String name) {
+    public BodyParams setName(String name) {
         this.name = name;
         return this;
     }
@@ -48,7 +26,7 @@ public class QueryParam {
         return value;
     }
 
-    public QueryParam setValue(String value) {
+    public BodyParams setValue(String value) {
         this.value = value;
         return this;
     }
@@ -57,7 +35,7 @@ public class QueryParam {
         return description;
     }
 
-    public QueryParam setDescription(String description) {
+    public BodyParams setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -66,7 +44,7 @@ public class QueryParam {
         return clazz;
     }
 
-    public QueryParam setClazz(Class clazz) {
+    public BodyParams setClazz(Class clazz) {
         this.clazz = clazz;
         return this;
     }
